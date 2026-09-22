@@ -66,11 +66,16 @@ INDEX_PATH = BASE_DIR / "index.html"
 
 EVENT_NAME = os.getenv("EVENT_NAME", "Society One-Day Event")
 EVENT_DATE = os.getenv("EVENT_DATE", "2026-09-26")
-HOST = os.getenv("HOST", "127.0.0.1")
+HOST = os.getenv("HOST", "0.0.0.0")
 PORT = int(os.getenv("PORT", os.getenv("SERVER_PORT", "5000")))
 
 MONGO_URI = os.getenv("MONGO_URI", "").strip()
 MONGO_DB = os.getenv("MONGO_DB", "event_pos").strip() or "event_pos"
+
+# Browser origins allowed to call the API. For this internal event POS,
+# "*" is intentionally supported by default; set CORS_ORIGIN to the exact
+# GitHub Pages origin for a tighter production configuration.
+CORS_ORIGIN = os.getenv("CORS_ORIGIN", "*").strip() or "*"
 
 # IST is the event timezone.
 IST = timezone(timedelta(hours=5, minutes=30))
@@ -1299,6 +1304,8 @@ def send_bytes(handler, status: int, body: bytes, content_type: str, filename: s
     handler.send_header("Content-Type", content_type)
     handler.send_header("Content-Length", str(len(body)))
     handler.send_header("Cache-Control", "no-store, no-cache, must-revalidate")
+    handler.send_header("Access-Control-Allow-Origin", CORS_ORIGIN)
+    handler.send_header("Vary", "Origin")
     handler.send_header("Pragma", "no-cache")
     if filename:
         handler.send_header("Content-Disposition", f'attachment; filename="{filename}"')
@@ -1327,6 +1334,15 @@ class Handler(BaseHTTPRequestHandler):
 
     def error(self, status: int, message: str) -> None:
         self.json(status, {"ok": False, "error": message})
+
+    def do_OPTIONS(self) -> None:
+        self.send_response(204)
+        self.send_header("Access-Control-Allow-Origin", CORS_ORIGIN)
+        self.send_header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
+        self.send_header("Access-Control-Allow-Headers", "Content-Type")
+        self.send_header("Access-Control-Max-Age", "600")
+        self.send_header("Vary", "Origin")
+        self.end_headers()
 
     def do_GET(self) -> None:
         parsed = urlparse(self.path)

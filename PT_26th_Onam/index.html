@@ -369,12 +369,21 @@ const state = {
   inventorySku: null
 };
 
+// API connection
+// Local test: automatically uses the same Python server.
+// GitHub Pages: replace the Render URL below after you create the backend.
+const RENDER_API_URL = "https://YOUR-RENDER-SERVICE.onrender.com";
+const API_BASE = window.location.hostname.endsWith("github.io")
+  ? RENDER_API_URL.replace(/\\/+$/, "")
+  : "";
+const apiUrl = (path) => `${API_BASE}${path}`;
+
 const $ = (id) => document.getElementById(id);
 const money = (v) => `₹${Number(v || 0).toLocaleString("en-IN",{maximumFractionDigits:2})}`;
 const today = () => state.meta?.event_date || new Date().toISOString().slice(0,10);
 
 async function api(url, options={}) {
-  const res = await fetch(url, {cache:"no-store", ...options, headers:{"Content-Type":"application/json", ...(options.headers||{})}});
+  const res = await fetch(apiUrl(url), {cache:"no-store", ...options, headers:{"Content-Type":"application/json", ...(options.headers||{})}});
   const text = await res.text();
   let data = {};
   try { data = text ? JSON.parse(text) : {}; } catch { data = {error:text || "Unexpected response"}; }
@@ -383,7 +392,7 @@ async function api(url, options={}) {
 }
 
 function downloadUrl(url){
-  const a=document.createElement("a"); a.href=url; a.style.display="none"; document.body.appendChild(a); a.click(); a.remove();
+  const a=document.createElement("a"); a.href=apiUrl(url); a.style.display="none"; document.body.appendChild(a); a.click(); a.remove();
 }
 
 function toast(msg){
@@ -727,7 +736,7 @@ async function resetEvent(){
   if(!confirm(text))return;
 
   try{
-    const res=await fetch("/api/reset",{method:"POST",cache:"no-store"});
+    const res=await fetch(apiUrl("/api/reset"),{method:"POST",cache:"no-store"});
     if(!res.ok){
       const t=await res.text(); throw new Error(t||"Reset failed");
     }
