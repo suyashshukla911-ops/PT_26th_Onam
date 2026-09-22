@@ -1,0 +1,802 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="light">
+<title>Event POS — Billing & Inventory</title>
+<style>
+:root{
+  --bg:#eef7ff;
+  --bg2:#e4f2ff;
+  --surface:#ffffff;
+  --surface2:#f6fbff;
+  --line:#cfe4f7;
+  --line2:#b7d7ef;
+  --text:#17324d;
+  --muted:#6f8498;
+  --blue:#59a9df;
+  --blue2:#2d83bd;
+  --blueSoft:#e6f4ff;
+  --good:#2f9e72;
+  --warn:#d99a2b;
+  --bad:#d84c5a;
+  --shadow:0 16px 40px rgba(48,103,145,.10);
+  --r:18px;
+  --r2:12px;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;
+  background:
+    radial-gradient(circle at 10% 0%,rgba(120,190,235,.18),transparent 34%),
+    radial-gradient(circle at 90% 10%,rgba(174,218,249,.18),transparent 32%),
+    var(--bg);
+  color:var(--text);
+  font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+}
+button,input,select{font:inherit}
+button{cursor:pointer}
+.topbar{
+  position:sticky;top:0;z-index:20;
+  display:flex;align-items:center;justify-content:space-between;
+  gap:20px;padding:16px 24px;
+  background:rgba(255,255,255,.92);
+  border-bottom:1px solid var(--line);
+  backdrop-filter:blur(14px);
+}
+.brand{display:flex;align-items:center;gap:12px}
+.brand-dot{width:11px;height:11px;border-radius:50%;background:var(--blue2);box-shadow:0 0 0 6px rgba(89,169,223,.14)}
+.brand-title{font-weight:800;letter-spacing:.08em;font-size:.95rem}
+.brand-sub{font-size:.72rem;color:var(--muted);margin-top:2px}
+.top-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+.btn,.ghost,.danger,.icon{
+  border:1px solid var(--line2);border-radius:11px;
+  background:var(--surface);color:var(--text);
+  padding:10px 14px;font-weight:700;
+}
+.ghost:hover,.btn:hover{border-color:var(--blue);background:var(--blueSoft)}
+.primary{
+  border:0;border-radius:12px;background:var(--blue2);color:#fff;
+  padding:13px 16px;font-weight:800;
+  box-shadow:0 10px 22px rgba(45,131,189,.18);
+}
+.primary:hover{background:#246f9e}
+.danger{
+  border-color:#f2b5bb;background:#fff5f6;color:#b62e3c;
+}
+.danger:hover{background:#ffe8eb;border-color:#df7884}
+.status{
+  display:flex;align-items:center;gap:7px;
+  border:1px solid var(--line);background:var(--surface2);
+  border-radius:999px;padding:8px 12px;font-size:.75rem;color:var(--muted)
+}
+.status i{width:7px;height:7px;border-radius:50%;background:var(--warn)}
+.status.ok i{background:var(--good)}
+.status.bad i{background:var(--bad)}
+.shell{max-width:1480px;margin:0 auto;padding:28px 24px 48px}
+.section{margin-bottom:28px}
+.section-head,.panel-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px}
+.eyebrow{font-size:.68rem;letter-spacing:.16em;font-weight:900;color:var(--blue2);text-transform:uppercase}
+h1,h2,h3{margin:0}
+h1{font-size:clamp(2rem,4vw,3.2rem);letter-spacing:-.03em;margin-top:5px}
+h2{font-size:1.15rem;letter-spacing:-.02em}
+.sub{margin-top:8px;color:var(--muted);max-width:760px}
+.date-pick{display:flex;gap:8px;align-items:center;color:var(--muted);font-size:.8rem}
+input,select{
+  width:100%;padding:11px 12px;border:1px solid var(--line2);
+  border-radius:10px;background:#fff;color:var(--text);outline:none;
+}
+input:focus,select:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(89,169,223,.12)}
+.date-pick input{width:auto}
+.kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-top:18px}
+.kpi{
+  background:rgba(255,255,255,.88);border:1px solid var(--line);border-radius:var(--r);
+  padding:18px;box-shadow:var(--shadow)
+}
+.kpi-label{font-size:.7rem;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);font-weight:800}
+.kpi strong{display:block;font-size:1.65rem;margin-top:7px}
+.kpi small{display:block;color:var(--muted);margin-top:5px}
+.dash{display:grid;grid-template-columns:1.2fr 1fr 1fr;gap:12px;margin-top:12px}
+.panel{
+  background:rgba(255,255,255,.9);border:1px solid var(--line);
+  border-radius:var(--r);box-shadow:var(--shadow)
+}
+.panel.pad{padding:18px}
+.list{display:flex;flex-direction:column;gap:10px;margin-top:15px}
+.bar-row{display:grid;grid-template-columns:minmax(120px,1fr) 70px;gap:12px;align-items:center}
+.bar-label{font-size:.86rem;font-weight:700}
+.bar-track{height:9px;border-radius:99px;background:#eaf4fb;overflow:hidden;margin-top:5px}
+.bar-fill{height:100%;border-radius:inherit;background:linear-gradient(90deg,#8bc8ec,#4d9fd1)}
+.bar-num{text-align:right;font:700 .82rem ui-monospace,monospace}
+.pay-row,.low-row{display:flex;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px dashed var(--line)}
+.pay-row:last-child,.low-row:last-child{border-bottom:0}
+.low-badge{font-size:.7rem;font-weight:900;padding:5px 8px;border-radius:999px;background:#fff3d7;color:#9a6714}
+.pos{display:grid;grid-template-columns:minmax(0,1.45fr) minmax(340px,.7fr);gap:14px}
+.panel-section{padding:18px}
+.sticky{position:sticky;top:89px;z-index:6;background:rgba(255,255,255,.96);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.shortcuts{font-size:.7rem;color:var(--muted);white-space:nowrap}
+kbd{border:1px solid var(--line2);background:#f9fcff;border-radius:6px;padding:3px 6px;font:700 .68rem ui-monospace,monospace}
+.tabs{display:flex;gap:8px;flex-wrap:wrap;padding:14px 18px 6px}
+.tab{border:1px solid var(--line2);background:#fff;color:var(--text);border-radius:999px;padding:8px 13px;font-size:.76rem;font-weight:800}
+.tab.active{background:var(--blue2);color:#fff;border-color:var(--blue2)}
+.products{padding:12px 18px 18px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.product{
+  background:linear-gradient(180deg,#fff,#f7fbff);
+  border:1px solid var(--line);border-radius:14px;padding:15px;text-align:left;
+  min-height:138px;transition:.16s;
+}
+.product:hover{transform:translateY(-2px);border-color:#91c9eb;box-shadow:0 12px 28px rgba(51,113,158,.08)}
+.product:disabled{opacity:.46;cursor:not-allowed;transform:none}
+.product-head{display:flex;justify-content:space-between;gap:10px}
+.product-name{font-weight:800}
+.price{color:var(--blue2);font-weight:900}
+.unit{font-size:.72rem;color:var(--muted);margin-top:4px}
+.stock{font:700 .7rem ui-monospace,monospace;color:#57738a;margin-top:12px}
+.combo{margin:0 18px 18px;border:1px solid #b9dbf3;background:#f0f9ff;border-radius:15px;padding:14px}
+.combo-title{font-weight:900}
+.combo-sub{color:var(--muted);font-size:.78rem;margin-top:4px}
+.combo-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:11px}
+.combo-btn{border:1px solid #add5f1;background:#fff;border-radius:11px;padding:11px;text-align:left}
+.combo-btn:hover{border-color:var(--blue);background:#f8fcff}
+.combo-btn b{display:block}
+.combo-btn span{font-size:.72rem;color:var(--muted)}
+.cart{display:flex;flex-direction:column;min-height:680px}
+.cart-head{padding:18px;border-bottom:1px solid var(--line)}
+.cart-body{padding:14px 18px;flex:1;overflow:auto}
+.empty{text-align:center;color:var(--muted);padding:40px 12px}
+.cart-item{border:1px solid var(--line);border-radius:12px;padding:11px;margin-bottom:9px;background:#fbfdff}
+.cart-item-top{display:flex;justify-content:space-between;gap:10px}
+.cart-item-name{font-weight:800;font-size:.86rem}
+.cart-item-meta{color:var(--muted);font-size:.72rem;margin-top:4px}
+.qty-row{display:flex;align-items:center;justify-content:space-between;margin-top:9px}
+.qty-controls{display:flex;align-items:center;gap:5px}
+.qty-btn{width:28px;height:28px;border:1px solid var(--line2);background:#fff;border-radius:8px;font-weight:900}
+.qty-btn:hover{background:var(--blueSoft)}
+.bill-foot{border-top:1px solid var(--line);padding:16px 18px;background:#fbfdff}
+.summary{display:grid;gap:8px}
+.sum-row{display:flex;justify-content:space-between;align-items:center}
+.total{font-size:1.2rem;font-weight:900;padding-top:9px;margin-top:4px;border-top:1px solid var(--line)}
+.pay-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:13px}
+.change{padding:11px;border:1px solid #c9e4f6;background:#eef8ff;border-radius:10px;display:flex;justify-content:space-between;font-weight:800;grid-column:1/-1}
+.action-row{display:grid;grid-template-columns:1fr auto;gap:8px;margin-top:12px}
+.message{min-height:21px;font-size:.78rem;margin-top:8px;color:var(--good)}
+.message.error{color:var(--bad)}
+.editing{
+  display:none;margin-bottom:9px;padding:10px;border:1px solid #b6dafa;background:#edf8ff;
+  border-radius:10px;font-size:.76rem;font-weight:800;justify-content:space-between;align-items:center
+}
+.editing.show{display:flex}
+.table-panel{padding:18px;margin-top:14px}
+.table-wrap{overflow:auto}
+table{border-collapse:collapse;width:100%;min-width:760px}
+th,td{padding:11px 10px;border-bottom:1px solid var(--line);text-align:left;font-size:.78rem}
+th{font-size:.68rem;text-transform:uppercase;letter-spacing:.08em;color:#668096;background:#f5faff;position:sticky;top:0}
+td strong{font-weight:800}
+.status-pill{display:inline-flex;padding:5px 8px;border-radius:999px;font-size:.65rem;font-weight:900}
+.ok{background:#e5f8ef;color:#277a58}
+.warn{background:#fff2d6;color:#996811}
+.void{background:#ffe7ea;color:#aa3140}
+.actions{display:flex;gap:6px;flex-wrap:wrap}
+.small-btn{padding:7px 9px;border:1px solid var(--line2);background:#fff;border-radius:8px;font-size:.7rem;font-weight:800}
+.small-btn:hover{background:var(--blueSoft)}
+.modal{
+  position:fixed;inset:0;background:rgba(30,61,84,.35);display:none;place-items:center;z-index:50;padding:20px
+}
+.modal.show{display:grid}
+.modal-card{width:min(460px,100%);background:#fff;border:1px solid var(--line);border-radius:18px;box-shadow:0 30px 80px rgba(25,72,106,.22);padding:20px}
+.modal-head{display:flex;justify-content:space-between;align-items:center}
+.form-grid{display:grid;gap:11px;margin-top:14px}
+.close{width:36px;height:36px;border:1px solid var(--line2);border-radius:50%;background:#fff;font-size:1.2rem}
+.toast{
+  position:fixed;right:22px;bottom:22px;z-index:100;opacity:0;transform:translateY(12px);
+  background:#17324d;color:#fff;padding:12px 14px;border-radius:10px;transition:.2s;pointer-events:none;font-size:.8rem
+}
+.toast.show{opacity:1;transform:none}
+@media(max-width:1150px){
+  .kpis{grid-template-columns:repeat(3,1fr)}
+  .dash{grid-template-columns:1fr}
+  .pos{grid-template-columns:1fr}
+  .cart{min-height:auto;position:static}
+}
+@media(max-width:760px){
+  .topbar{align-items:flex-start}
+  .top-actions{justify-content:flex-start}
+  .shell{padding:18px 12px 32px}
+  .section-head{flex-direction:column}
+  .kpis{grid-template-columns:1fr 1fr}
+  .products{grid-template-columns:1fr 1fr;padding:10px}
+  .combo{margin:0 10px 10px}
+  .combo-grid{grid-template-columns:1fr}
+  .shortcuts{display:none}
+  .pay-grid{grid-template-columns:1fr}
+  .action-row{grid-template-columns:1fr}
+}
+@media(max-width:460px){
+  .kpis{grid-template-columns:1fr}
+  .products{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<header class="topbar">
+  <div class="brand">
+    <span class="brand-dot"></span>
+    <div>
+      <div class="brand-title">EVENT POS</div>
+      <div class="brand-sub" id="eventMeta">Loading event…</div>
+    </div>
+  </div>
+  <div class="top-actions">
+    <button class="ghost" id="exportSales">Sales CSV</button>
+    <button class="ghost" id="exportInventory">Inventory CSV</button>
+    <button class="ghost" id="exportMovements">Movements CSV</button>
+    <button class="ghost" id="exportExcel">Excel</button>
+    <button class="danger" id="resetEvent">RESET EVENT</button>
+    <div class="status" id="dbStatus"><i></i> Checking MongoDB…</div>
+  </div>
+</header>
+
+<main class="shell">
+
+<section class="section">
+  <div class="section-head">
+    <div>
+      <div class="eyebrow">EVENT CONTROL</div>
+      <h1>Billing & live stock</h1>
+      <p class="sub">Every completed bill updates MongoDB, inventory, revenue, payment totals, recent bills, and the event export immediately.</p>
+    </div>
+    <label class="date-pick">View date <input type="date" id="dashboardDate"></label>
+  </div>
+
+  <div class="kpis">
+    <article class="kpi"><span class="kpi-label">Revenue</span><strong id="kpiRevenue">₹0</strong><small>Completed bills</small></article>
+    <article class="kpi"><span class="kpi-label">Bills</span><strong id="kpiBills">0</strong><small>Completed requests</small></article>
+    <article class="kpi"><span class="kpi-label">Avg. bill</span><strong id="kpiAvg">₹0</strong><small>Revenue ÷ bills</small></article>
+    <article class="kpi"><span class="kpi-label">Gross profit</span><strong id="kpiProfit">₹0</strong><small>Sale value − seeded cost</small></article>
+    <article class="kpi"><span class="kpi-label">Inventory value</span><strong id="kpiInventory">₹0</strong><small>Current stock at cost</small></article>
+  </div>
+
+  <div class="dash">
+    <article class="panel pad"><div class="panel-head"><div><div class="eyebrow">TOP SALES</div><h2>Products moving fastest</h2></div></div><div id="topProducts" class="list"></div></article>
+    <article class="panel pad"><div class="panel-head"><div><div class="eyebrow">PAYMENTS</div><h2>Collection mix</h2></div></div><div id="paymentMix" class="list"></div></article>
+    <article class="panel pad"><div class="panel-head"><div><div class="eyebrow">ATTENTION</div><h2>Low stock</h2></div></div><div id="lowStock" class="list"></div></article>
+  </div>
+</section>
+
+<section class="pos">
+  <div class="panel">
+    <div class="panel-section sticky">
+      <div class="panel-head">
+        <div><div class="eyebrow">COUNTER</div><h2>Build bill</h2></div>
+        <div class="shortcuts"><kbd>1–9</kbd> quick add · <kbd>Ctrl</kbd>+<kbd>Enter</kbd> bill · <kbd>Esc</kbd> clear</div>
+      </div>
+    </div>
+
+    <div id="categoryTabs" class="tabs"></div>
+    <div id="productGrid" class="products"></div>
+
+    <div class="combo">
+      <div class="combo-title">Choco Pops · 2 for ₹70</div>
+      <div class="combo-sub">Stock is tracked as one 200-piece Choco Pops pool because your workbook gives 200 total pieces. The selected flavour combination is recorded on the bill.</div>
+      <div class="combo-grid">
+        <button class="combo-btn" data-kind="choco_combo_same" data-flavor="chana"><b>Same</b><span>2 Chana</span></button>
+        <button class="combo-btn" data-kind="choco_combo_same" data-flavor="peanuts"><b>Same</b><span>2 Peanuts</span></button>
+        <button class="combo-btn" data-kind="choco_combo_different"><b>Different</b><span>1 Chana + 1 Peanuts</span></button>
+      </div>
+    </div>
+  </div>
+
+  <aside class="panel cart">
+    <div class="cart-head">
+      <div class="panel-head">
+        <div><div class="eyebrow">CURRENT REQUEST</div><h2 id="billTitle">Bill</h2></div>
+        <button class="close" id="clearCart" title="Clear current bill">×</button>
+      </div>
+    </div>
+
+    <div class="cart-body">
+      <div class="editing" id="editingBanner"><span>Editing <span id="editingNo"></span></span><button class="small-btn" id="cancelEdit">Cancel edit</button></div>
+      <div id="cartItems" class="empty">No items yet</div>
+    </div>
+
+    <div class="bill-foot">
+      <div class="summary">
+        <div class="sum-row"><span>Subtotal</span><strong id="subtotal">₹0</strong></div>
+        <div class="sum-row"><span>Discount</span><label style="display:flex;align-items:center;gap:5px">₹<input id="discount" type="number" min="0" step="1" value="0" style="width:100px;padding:7px"></label></div>
+        <div class="sum-row total"><span>Total</span><strong id="total">₹0</strong></div>
+      </div>
+
+      <div class="pay-grid">
+        <label>Payment<select id="paymentMode"><option>Cash</option><option>UPI</option><option>Card</option><option>Other</option></select></label>
+        <label>Amount received<input id="amountPaid" type="number" min="0" step="1" placeholder="0"></label>
+        <div class="change"><span>Change</span><strong id="changeDue">₹0</strong></div>
+      </div>
+
+      <div class="action-row">
+        <button class="primary" id="completeBill">Complete bill <span style="opacity:.75">Ctrl + Enter</span></button>
+        <button class="danger" id="clearBill">Clear</button>
+      </div>
+      <div id="billMessage" class="message"></div>
+    </div>
+  </aside>
+</section>
+
+<section class="panel table-panel">
+  <div class="panel-head">
+    <div><div class="eyebrow">INVENTORY CONTROL</div><h2>Stock by item</h2></div>
+    <div class="actions"><button class="small-btn" id="refreshAll">Refresh now</button></div>
+  </div>
+  <div class="table-wrap" style="margin-top:12px">
+    <table><thead><tr><th>Item</th><th>Category</th><th>Sale Price</th><th>Opening</th><th>Current</th><th>Sold</th><th>Low at</th><th>Status</th><th>Action</th></tr></thead><tbody id="inventoryBody"></tbody></table>
+  </div>
+</section>
+
+<section class="panel table-panel">
+  <div class="panel-head">
+    <div><div class="eyebrow">ORDER LOG</div><h2>Recent bills</h2></div>
+    <span style="color:var(--muted);font-size:.76rem">Edit restores old stock, applies the new bill, then refreshes all totals.</span>
+  </div>
+  <div class="table-wrap" style="margin-top:12px">
+    <table><thead><tr><th>Bill</th><th>Time</th><th>Items</th><th>Payment</th><th>Total</th><th>Status</th><th>Actions</th></tr></thead><tbody id="ordersBody"></tbody></table>
+  </div>
+</section>
+
+</main>
+
+<div class="modal" id="inventoryModal">
+  <div class="modal-card">
+    <div class="modal-head"><div><div class="eyebrow">STOCK UPDATE</div><h2 id="inventoryModalTitle">Update stock</h2></div><button class="close" id="closeInventory">×</button></div>
+    <div class="form-grid">
+      <label>Current stock<input id="stockInput" type="number" min="0"></label>
+      <label>Low-stock warning at<input id="thresholdInput" type="number" min="0"></label>
+      <button class="primary" id="saveInventory">Save inventory</button>
+      <div class="message" id="inventoryMessage"></div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const state = {
+  meta: null,
+  products: [],
+  cart: [],
+  category: "All",
+  editingOrder: null,
+  inventorySku: null
+};
+
+const $ = (id) => document.getElementById(id);
+const money = (v) => `₹${Number(v || 0).toLocaleString("en-IN",{maximumFractionDigits:2})}`;
+const today = () => state.meta?.event_date || new Date().toISOString().slice(0,10);
+
+async function api(url, options={}) {
+  const res = await fetch(url, {cache:"no-store", ...options, headers:{"Content-Type":"application/json", ...(options.headers||{})}});
+  const text = await res.text();
+  let data = {};
+  try { data = text ? JSON.parse(text) : {}; } catch { data = {error:text || "Unexpected response"}; }
+  if (!res.ok) throw new Error(data.error || `HTTP ${res.status}`);
+  return data;
+}
+
+function downloadUrl(url){
+  const a=document.createElement("a"); a.href=url; a.style.display="none"; document.body.appendChild(a); a.click(); a.remove();
+}
+
+function toast(msg){
+  const t=$("toast"); t.textContent=msg; t.classList.add("show");
+  clearTimeout(window.__toast); window.__toast=setTimeout(()=>t.classList.remove("show"),2500);
+}
+
+function message(el,msg,error=false){
+  el.textContent=msg || "";
+  el.classList.toggle("error",!!error);
+}
+
+async function loadMeta(){
+  state.meta = await api("/api/meta");
+  $("eventMeta").textContent = `${state.meta.event_name} · ${state.meta.event_date}`;
+  $("dashboardDate").value = state.meta.event_date;
+  $("dashboardDate").max = state.meta.event_date;
+}
+
+async function checkHealth(){
+  try{
+    const h = await api("/api/health");
+    const el=$("dbStatus");
+    el.classList.toggle("ok", !!h.ok);
+    el.classList.toggle("bad", !h.ok);
+    el.innerHTML=`<i></i> ${h.ok ? "MongoDB connected" : "MongoDB error"}`;
+  }catch(e){
+    $("dbStatus").classList.add("bad");
+    $("dbStatus").innerHTML="<i></i> MongoDB error";
+  }
+}
+
+async function loadProducts(){
+  state.products=(await api("/api/products")).products;
+  renderTabs();
+  renderProducts();
+  renderInventory();
+}
+
+function renderTabs(){
+  const tabs=$("categoryTabs");
+  tabs.innerHTML="";
+  const cats=state.meta?.categories || ["All"];
+  for(const cat of cats){
+    const b=document.createElement("button");
+    b.className="tab"+(state.category===cat?" active":"");
+    b.textContent=cat;
+    b.onclick=()=>{state.category=cat;renderTabs();renderProducts();};
+    tabs.appendChild(b);
+  }
+}
+
+function renderProducts(){
+  const grid=$("productGrid");
+  grid.innerHTML="";
+  let list=state.products;
+  if(state.category!=="All") list=list.filter(p=>p.category===state.category);
+  list.forEach((p,i)=>{
+    const b=document.createElement("button");
+    b.className="product";
+    b.disabled=Number(p.current_stock)<=0;
+    b.dataset.quick=i+1;
+    b.innerHTML=`
+      <div class="product-head"><div class="product-name">${escapeHtml(p.name)}</div><div class="price">${money(p.price)}</div></div>
+      <div class="unit">per ${escapeHtml(p.unit)}</div>
+      <div class="stock">Stock: ${p.current_stock} ${escapeHtml(p.unit)} · Low at ${p.low_stock_threshold}</div>`;
+    b.onclick=()=>addSingle(p.sku);
+    grid.appendChild(b);
+  });
+}
+
+function addSingle(sku){
+  const p=state.products.find(x=>x.sku===sku);
+  if(!p)return;
+  if(Number(p.current_stock)<=0){toast("This item is out of stock.");return;}
+  const existing=state.cart.find(x=>x.kind==="single" && x.sku===sku);
+  if(existing) existing.qty++;
+  else state.cart.push({kind:"single",sku,qty:1});
+  renderCart();
+}
+
+function addCombo(kind, flavor){
+  if(!state.products.find(x=>x.sku==="choco-pops")) return;
+  const key=kind+(flavor||"");
+  const existing=state.cart.find(x=>(x.kind+(x.flavor||""))===key);
+  if(existing) existing.qty++;
+  else state.cart.push({kind, flavor, qty:1});
+  renderCart();
+}
+
+document.querySelectorAll(".combo-btn").forEach(b=>{
+  b.addEventListener("click",()=>addCombo(b.dataset.kind,b.dataset.flavor));
+});
+
+function lineForItem(item){
+  if(item.kind==="single"){
+    const p=state.products.find(x=>x.sku===item.sku);
+    return {name:p?.name||item.sku,unit:p?.unit||"pc",unitPrice:Number(p?.price||0),lineTotal:Number(p?.price||0)*item.qty,meta:""};
+  }
+  if(item.kind==="choco_combo_same"){
+    return {name:"Choco Pops — Same",unit:"combo",unitPrice:70,lineTotal:70*item.qty,meta:`2 ${item.flavor==="chana"?"Chana":"Peanuts"}`};
+  }
+  return {name:"Choco Pops — Different",unit:"combo",unitPrice:70,lineTotal:70*item.qty,meta:"1 Chana + 1 Peanuts"};
+}
+
+function renderCart(){
+  const box=$("cartItems");
+  box.innerHTML="";
+  if(!state.cart.length){
+    box.className="empty";
+    box.textContent="No items yet";
+  }else{
+    box.className="";
+    state.cart.forEach((item,index)=>{
+      const l=lineForItem(item);
+      const wrap=document.createElement("div"); wrap.className="cart-item";
+      wrap.innerHTML=`
+        <div class="cart-item-top"><div><div class="cart-item-name">${escapeHtml(l.name)}</div><div class="cart-item-meta">${l.meta || `₹${l.unitPrice} / ${l.unit}`}</div></div><strong>${money(l.lineTotal)}</strong></div>
+        <div class="qty-row"><span style="color:var(--muted);font-size:.72rem">${escapeHtml(l.unit)}</span><div class="qty-controls"><button class="qty-btn" data-minus="${index}">−</button><b>${item.qty}</b><button class="qty-btn" data-plus="${index}">+</button><button class="qty-btn" data-remove="${index}" title="Remove">×</button></div></div>`;
+      box.appendChild(wrap);
+    });
+    box.querySelectorAll("[data-minus]").forEach(b=>b.onclick=()=>changeQty(Number(b.dataset.minus),-1));
+    box.querySelectorAll("[data-plus]").forEach(b=>b.onclick=()=>changeQty(Number(b.dataset.plus),1));
+    box.querySelectorAll("[data-remove]").forEach(b=>b.onclick=()=>{state.cart.splice(Number(b.dataset.remove),1);renderCart();});
+  }
+  const subtotal=cartSubtotal();
+  $("subtotal").textContent=money(subtotal);
+  const discount=Number($("discount").value||0);
+  const total=Math.max(0,subtotal-discount);
+  $("total").textContent=money(total);
+  const paid=Number($("amountPaid").value||0);
+  $("changeDue").textContent=money(Math.max(0,paid-total));
+}
+
+function changeQty(i,d){
+  const item=state.cart[i]; if(!item)return;
+  item.qty=Math.max(0,item.qty+d);
+  if(!item.qty) state.cart.splice(i,1);
+  renderCart();
+}
+
+function cartSubtotal(){return state.cart.reduce((sum,x)=>sum+lineForItem(x).lineTotal,0)}
+
+function clearCurrentBill(){
+  state.cart=[]; state.editingOrder=null;
+  $("editingBanner").classList.remove("show");
+  $("billTitle").textContent="Bill";
+  $("completeBill").innerHTML="Complete bill <span style='opacity:.75'>Ctrl + Enter</span>";
+  $("discount").value=0;$("amountPaid").value="";
+  message($("billMessage"),"");
+  renderCart();
+}
+
+function loadCartFromOrder(order){
+  state.cart=order.items.map(i=>({
+    kind:i.kind||"single",
+    sku:i.sku,
+    flavor:i.flavor,
+    qty:Number(i.qty)
+  }));
+  $("discount").value=Number(order.discount||0);
+  $("amountPaid").value=Number(order.amount_paid||0);
+  $("paymentMode").value=order.payment_mode||"Cash";
+  state.editingOrder=order.order_no;
+  $("editingNo").textContent=order.order_no;
+  $("editingBanner").classList.add("show");
+  $("billTitle").textContent="Edit bill";
+  $("completeBill").innerHTML="Save bill changes";
+  renderCart();
+  window.scrollTo({top:document.querySelector(".pos").offsetTop-75,behavior:"smooth"});
+}
+
+async function submitBill(){
+  if(!state.cart.length){message($("billMessage"),"Add at least one item.",true);return}
+  const subtotal=cartSubtotal();
+  const discount=Number($("discount").value||0);
+  const paid=Number($("amountPaid").value||0);
+  if(discount<0 || discount>subtotal){message($("billMessage"),"Discount is invalid.",true);return}
+  const total=Math.max(0,subtotal-discount);
+  if(paid<total){message($("billMessage"),`Amount received must be at least ${money(total)}.`,true);return}
+
+  const payload={
+    items:state.cart,
+    discount,
+    amount_paid:paid,
+    payment_mode:$("paymentMode").value
+  };
+
+  $("completeBill").disabled=true;
+  try{
+    let result;
+    if(state.editingOrder) result=await api("/api/orders/"+encodeURIComponent(state.editingOrder),{method:"PUT",body:JSON.stringify(payload)});
+    else result=await api("/api/orders",{method:"POST",body:JSON.stringify(payload)});
+    const no=result.order.order_no;
+    message($("billMessage"),`Saved ${no}. Data synced to MongoDB.`);
+    toast(`Bill ${no} saved`);
+    clearCurrentBill();
+    await refreshAll();
+  }catch(e){message($("billMessage"),e.message,true)}
+  finally{$("completeBill").disabled=false}
+}
+
+async function editOrder(orderNo){
+  try{
+    const r=await api("/api/orders/"+encodeURIComponent(orderNo));
+    loadCartFromOrder(r.order);
+  }catch(e){toast(e.message)}
+}
+
+async function voidOrder(orderNo){
+  if(!confirm(`Void bill ${orderNo}?\n\nIts stock will be restored and revenue will be removed from completed totals.`))return;
+  try{
+    await api("/api/orders/"+encodeURIComponent(orderNo),{method:"DELETE"});
+    toast(`${orderNo} voided`);
+    if(state.editingOrder===orderNo) clearCurrentBill();
+    await refreshAll();
+  }catch(e){toast(e.message)}
+}
+
+function renderInventory(){
+  const body=$("inventoryBody"); body.innerHTML="";
+  state.products.forEach(p=>{
+    const tr=document.createElement("tr");
+    const status=p.current_stock===0?"OUT OF STOCK":p.current_stock<=p.low_stock_threshold?"LOW":"OK";
+    const cls=status==="OK"?"ok":status==="LOW"?"warn":"void";
+    tr.innerHTML=`
+      <td><strong>${escapeHtml(p.name)}</strong></td>
+      <td>${escapeHtml(p.category)}</td>
+      <td>${money(p.price)}</td>
+      <td>${p.opening_stock}</td>
+      <td><strong>${p.current_stock}</strong></td>
+      <td>${p.sold_qty ?? "—"}</td>
+      <td>${p.low_stock_threshold}</td>
+      <td><span class="status-pill ${cls}">${status}</span></td>
+      <td><button class="small-btn" data-stock="${escapeAttr(p.sku)}">Edit stock</button></td>`;
+    body.appendChild(tr);
+  });
+  body.querySelectorAll("[data-stock]").forEach(b=>b.onclick=()=>openInventory(b.dataset.stock));
+}
+
+function openInventory(sku){
+  const p=state.products.find(x=>x.sku===sku); if(!p)return;
+  state.inventorySku=sku;
+  $("inventoryModalTitle").textContent=`Update ${p.name}`;
+  $("stockInput").value=p.current_stock;
+  $("thresholdInput").value=p.low_stock_threshold;
+  message($("inventoryMessage"),"");
+  $("inventoryModal").classList.add("show");
+}
+
+function closeInventory(){ $("inventoryModal").classList.remove("show"); state.inventorySku=null; }
+
+async function saveInventory(){
+  const sku=state.inventorySku;
+  if(!sku)return;
+  try{
+    await api("/api/inventory/"+encodeURIComponent(sku)+"/stock",{
+      method:"POST",
+      body:JSON.stringify({
+        current_stock:Number($("stockInput").value),
+        low_stock_threshold:Number($("thresholdInput").value)
+      })
+    });
+    closeInventory();
+    toast("Inventory updated");
+    await refreshAll();
+  }catch(e){message($("inventoryMessage"),e.message,true)}
+}
+
+async function loadDashboard(){
+  const day=$("dashboardDate").value || today();
+  const d=await api("/api/dashboard?date="+encodeURIComponent(day));
+  $("kpiRevenue").textContent=money(d.revenue);
+  $("kpiBills").textContent=d.bills;
+  $("kpiAvg").textContent=money(d.avg_bill);
+  $("kpiProfit").textContent=money(d.gross_profit);
+  $("kpiInventory").textContent=money(d.inventory_value);
+
+  const top=$("topProducts"); top.innerHTML="";
+  const max=Math.max(1,...d.top_products.map(x=>x.revenue));
+  d.top_products.forEach(x=>{
+    const row=document.createElement("div"); row.innerHTML=`
+      <div class="bar-row"><div><div class="bar-label">${escapeHtml(x.name)}</div><div class="bar-track"><div class="bar-fill" style="width:${(x.revenue/max)*100}%"></div></div></div><div class="bar-num">${money(x.revenue)}</div></div>`;
+    top.appendChild(row);
+  });
+  if(!d.top_products.length)top.innerHTML='<div class="empty">No completed sales for this date.</div>';
+
+  const pm=$("paymentMix"); pm.innerHTML="";
+  d.payments.forEach(x=>{
+    const row=document.createElement("div");row.className="pay-row";row.innerHTML=`<span><strong>${escapeHtml(x.payment_mode)}</strong> · ${x.bills} bill(s)</span><strong>${money(x.amount)}</strong>`;pm.appendChild(row);
+  });
+  if(!d.payments.length)pm.innerHTML='<div class="empty">No payment data yet.</div>';
+
+  const ls=$("lowStock"); ls.innerHTML="";
+  d.low_stock.forEach(x=>{
+    const row=document.createElement("div");row.className="low-row";row.innerHTML=`<span>${escapeHtml(x.name)}</span><span class="low-badge">${x.stock} ${escapeHtml(x.unit)} left</span>`;ls.appendChild(row);
+  });
+  if(!d.low_stock.length)ls.innerHTML='<div class="empty">No low-stock items.</div>';
+}
+
+async function loadOrders(){
+  const day=$("dashboardDate").value || today();
+  const r=await api("/api/orders?date="+encodeURIComponent(day));
+  const body=$("ordersBody");body.innerHTML="";
+  r.orders.forEach(o=>{
+    const itemText=o.items.map(i=>`${i.display_name} ×${i.qty}`).join(", ");
+    const cls=o.status==="completed"?"ok":"void";
+    const tr=document.createElement("tr");
+    tr.innerHTML=`
+      <td><strong>${escapeHtml(o.order_no)}</strong></td>
+      <td>${formatDate(o.created_at)}</td>
+      <td style="max-width:360px">${escapeHtml(itemText)}</td>
+      <td>${escapeHtml(o.payment_mode)}</td>
+      <td><strong>${money(o.total)}</strong></td>
+      <td><span class="status-pill ${cls}">${escapeHtml(o.status)}</span></td>
+      <td><div class="actions">${o.status==="completed"?`<button class="small-btn" data-edit="${escapeAttr(o.order_no)}">Edit</button><button class="small-btn" data-void="${escapeAttr(o.order_no)}">Void</button>`:"—"}</div></td>`;
+    body.appendChild(tr);
+  });
+  if(!r.orders.length)body.innerHTML='<tr><td colspan="7"><div class="empty">No bills for this date.</div></td></tr>';
+  body.querySelectorAll("[data-edit]").forEach(b=>b.onclick=()=>editOrder(b.dataset.edit));
+  body.querySelectorAll("[data-void]").forEach(b=>b.onclick=()=>voidOrder(b.dataset.void));
+}
+
+async function refreshAll(){
+  try{
+    await loadProducts();
+    await Promise.all([loadDashboard(),loadOrders(),checkHealth()]);
+  }catch(e){
+    toast(e.message);
+  }
+}
+
+async function resetEvent(){
+  const text =
+    "RESET EVENT will:\n\n" +
+    "1. Download a complete backup ZIP first.\n" +
+    "2. Remove all bills and inventory movements from MongoDB.\n" +
+    "3. Restore every product to its opening inventory.\n" +
+    "4. Reset the bill counter.\n\n" +
+    "Use this for testing only. Continue?";
+  if(!confirm(text))return;
+
+  try{
+    const res=await fetch("/api/reset",{method:"POST",cache:"no-store"});
+    if(!res.ok){
+      const t=await res.text(); throw new Error(t||"Reset failed");
+    }
+    const blob=await res.blob();
+    const a=document.createElement("a");
+    a.href=URL.createObjectURL(blob);
+    a.download=`event_reset_backup_${today()}.zip`;
+    document.body.appendChild(a);a.click();a.remove();
+    setTimeout(()=>URL.revokeObjectURL(a.href),2000);
+    clearCurrentBill();
+    toast("Backup downloaded. Event data has been reset.");
+    await refreshAll();
+  }catch(e){toast("Reset failed: "+e.message)}
+}
+
+function formatDate(v){
+  try{return new Date(v).toLocaleTimeString("en-IN",{hour:"2-digit",minute:"2-digit"})}
+  catch{return v}
+}
+function escapeHtml(v){
+  return String(v??"").replace(/[&<>"']/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch]));
+}
+function escapeAttr(v){return escapeHtml(v)}
+
+$("dashboardDate").addEventListener("change",async()=>{await loadDashboard();await loadOrders()});
+$("discount").addEventListener("input",renderCart);
+$("amountPaid").addEventListener("input",renderCart);
+$("clearCart").onclick=clearCurrentBill;
+$("clearBill").onclick=clearCurrentBill;
+$("cancelEdit").onclick=clearCurrentBill;
+$("completeBill").onclick=submitBill;
+$("closeInventory").onclick=closeInventory;
+$("saveInventory").onclick=saveInventory;
+$("refreshAll").onclick=async()=>{await refreshAll();toast("Data refreshed")};
+$("resetEvent").onclick=resetEvent;
+$("exportSales").onclick=()=>downloadUrl("/api/export/sales.csv");
+$("exportInventory").onclick=()=>downloadUrl("/api/export/inventory.csv");
+$("exportMovements").onclick=()=>downloadUrl("/api/export/inventory-movements.csv");
+$("exportExcel").onclick=()=>downloadUrl("/api/export/excel.xlsx");
+
+document.addEventListener("keydown",(e)=>{
+  if(e.ctrlKey&&e.key==="Enter"){e.preventDefault();submitBill()}
+  if(e.key==="Escape"){
+    if($("inventoryModal").classList.contains("show")) closeInventory();
+    else clearCurrentBill();
+  }
+  if(!e.ctrlKey&&!e.altKey&&!e.metaKey){
+    const n=Number(e.key);
+    if(n>=1&&n<=9){
+      const btn=[...document.querySelectorAll(".product")][n-1];
+      if(btn&&!btn.disabled)btn.click();
+    }
+    if(e.key==="0"){
+      const btn=[...document.querySelectorAll(".product")][9];
+      if(btn&&!btn.disabled)btn.click();
+    }
+  }
+});
+
+(async function init(){
+  try{
+    await loadMeta();
+    await refreshAll();
+  }catch(e){
+    toast(e.message);
+    $("dbStatus").classList.add("bad");
+    $("dbStatus").innerHTML="<i></i> MongoDB not connected";
+  }
+})();
+</script>
+</body>
+</html>
