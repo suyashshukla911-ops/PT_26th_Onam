@@ -374,7 +374,7 @@ const state = {
 // GitHub Pages: replace the Render URL below after you create the backend.
 const RENDER_API_URL = "https://YOUR-RENDER-SERVICE.onrender.com";
 const API_BASE = window.location.hostname.endsWith("github.io")
-  ? RENDER_API_URL.replace(/\\/+$/, "")
+  ? RENDER_API_URL.replace(/\/+$/, "")
   : "";
 const apiUrl = (path) => `${API_BASE}${path}`;
 

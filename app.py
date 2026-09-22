@@ -39,7 +39,6 @@ import os
 import re
 import sys
 import zipfile
-from dotenv import load_dotenv
 from datetime import datetime, date, time, timezone, timedelta
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
@@ -56,7 +55,6 @@ except ImportError:
         "    py -m pip install pymongo\n"
         "Then run: py app.py"
     )
-load_dotenv()
 # ---------------------------------------------------------------------
 # Paths / configuration
 # ---------------------------------------------------------------------
