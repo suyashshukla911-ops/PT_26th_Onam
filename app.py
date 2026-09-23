@@ -676,10 +676,14 @@ def set_inventory(sku: str, new_stock: int, threshold: int) -> dict[str, Any]:
             old_stock = int(product["current_stock"])
             delta = int(new_stock) - old_stock
 
+            # A manual stock edit becomes the new persistent inventory baseline.
+            # RESET EVENT clears sales/history but does not revert this saved stock
+            # value to the original seeded workbook quantity.
             db.products.update_one(
                 {"sku": sku},
                 {
                     "$set": {
+                        "opening_stock": int(new_stock),
                         "current_stock": int(new_stock),
                         "low_stock_threshold": int(threshold),
                         "updated_at": stamp,
@@ -1277,13 +1281,20 @@ def reset_event_and_return_backup() -> bytes:
         with session.start_transaction():
             db.orders.delete_many({}, session=session)
             db.inventory_movements.delete_many({}, session=session)
-            for p in PRODUCTS:
+
+            # Restore the persistent inventory baseline stored in MongoDB.
+            # Manual "Edit Stock" saves the new baseline into opening_stock,
+            # so RESET EVENT keeps that edited value while clearing event sales.
+            for p in db.products.find(
+                {"active": True},
+                {"sku": 1, "opening_stock": 1},
+                session=session,
+            ):
                 db.products.update_one(
                     {"sku": p["sku"]},
                     {
                         "$set": {
-                            "current_stock": int(p["opening_stock"]),
-                            "low_stock_threshold": int(p["low_stock_threshold"]),
+                            "current_stock": int(p.get("opening_stock", 0)),
                             "updated_at": now_ist(),
                         }
                     },
