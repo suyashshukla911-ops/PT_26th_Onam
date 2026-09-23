@@ -510,6 +510,85 @@ input.invalid,select.invalid{
   .in-cart{font-size:.52rem}
 }
 
+/* ===== Final mobile bill accordion + scroll-safe layout =====
+   UI-only refinement. Backend/API/MongoDB logic is unchanged. */
+
+/* The bill body and bill footer form a real vertical layout.
+   Long carts scroll inside the item area; the payment/Complete Bill
+   controls remain reachable without scrolling the entire page. */
+.bill-expandable{
+  display:flex;
+  flex-direction:column;
+  flex:1 1 auto;
+  min-height:0;
+  overflow:hidden;
+}
+.bill-expandable.collapsed{
+  display:none !important;
+}
+.bill-expandable .cart-body{
+  flex:1 1 auto;
+  min-height:0;
+  overflow-y:auto;
+  overflow-x:hidden;
+  -webkit-overflow-scrolling:touch;
+}
+.bill-expandable .bill-foot{
+  flex:0 0 auto;
+  max-height:none;
+  overflow:visible;
+}
+.cart.bill-collapsed{
+  min-height:0 !important;
+  height:auto !important;
+}
+.cart.bill-collapsed .bill-chevron{
+  transform:rotate(0deg);
+}
+
+@media(max-width:760px){
+  /* Expanded bill: larger working area with a dedicated scroll region. */
+  .cart{
+    height:min(58vh,520px);
+    min-height:0;
+  }
+  .cart:not(.bill-collapsed) .bill-expandable{
+    display:flex;
+    height:auto;
+  }
+  .cart:not(.bill-collapsed) .bill-expandable .cart-body{
+    max-height:none;
+  }
+
+  /* Payment + Complete Bill stay visible while item list scrolls. */
+  .cart:not(.bill-collapsed) .bill-foot{
+    position:relative;
+    z-index:3;
+    background:#fbfdff;
+    box-shadow:0 -5px 15px rgba(30,80,115,.08);
+  }
+
+  /* Collapsed = only the compact Current Request header remains. */
+  .cart.bill-collapsed{
+    height:auto !important;
+    min-height:0 !important;
+    max-height:none !important;
+  }
+  .cart.bill-collapsed .cart-head{
+    border-bottom:0;
+  }
+  .cart.bill-collapsed .bill-toggle-meta{
+    margin-left:auto;
+  }
+
+  /* Make the accordion target comfortably tappable on phones. */
+  .bill-toggle{
+    min-height:46px;
+    touch-action:manipulation;
+    -webkit-tap-highlight-color:transparent;
+  }
+}
+
 </style>
 </head>
 <body>
@@ -909,6 +988,7 @@ function syncMobileBillVisibility(){
   $("paymentSummaryReceived").textContent=money(Number($("amountPaid").value||0));
   $("paymentSummaryMode").textContent=$("paymentMode").value||"Cash";
   $("billToggle").setAttribute("aria-expanded",state.billCollapsed?"false":"true");
+  $("billCart").classList.toggle("bill-collapsed",!!state.billCollapsed);
 }
 
 function minimizeCurrentBill(){
@@ -919,6 +999,7 @@ function minimizeCurrentBill(){
 function openCurrentBill(){
   state.cartMinimized=false;
   state.billCollapsed=false;
+  $("billCart").classList.remove("bill-collapsed");
   $("billExpandable").classList.remove("collapsed");
   $("billToggle").setAttribute("aria-expanded","true");
   syncMobileBillVisibility();
@@ -926,6 +1007,7 @@ function openCurrentBill(){
 function toggleCurrentBillPanel(){
   state.billCollapsed=!state.billCollapsed;
   $("billExpandable").classList.toggle("collapsed",state.billCollapsed);
+  $("billCart").classList.toggle("bill-collapsed",state.billCollapsed);
   $("billToggle").setAttribute("aria-expanded",state.billCollapsed?"false":"true");
 }
 function handleCartClose(){
@@ -982,6 +1064,7 @@ function cartSubtotal(){return state.cart.reduce((sum,x)=>sum+lineForItem(x).lin
 
 function clearCurrentBill(){
   state.cart=[]; state.editingOrder=null; state.billCollapsed=false;
+  $("billCart").classList.remove("bill-collapsed");
   $("editingBanner").classList.remove("show");
   $("billTitle").textContent="Bill";
   $("completeBill").innerHTML="Complete bill <span style='opacity:.75'>Ctrl + Enter</span>";
