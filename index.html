@@ -238,6 +238,22 @@ td strong{font-weight:800}
 .inventory-facts{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:11px}.inventory-facts span{display:flex;justify-content:space-between;gap:8px;padding:8px;background:#f7fbff;border-radius:8px;font-size:.7rem;color:var(--muted)}.inventory-facts strong{color:var(--text)}.full-btn{width:100%;margin-top:10px;padding:9px}
 .order-items{margin-top:11px;padding:8px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}.order-item-line{display:flex;justify-content:space-between;gap:10px;padding:5px 0;font-size:.78rem}.order-muted{color:var(--muted);font-size:.75rem}
 .order-card-foot{display:flex;justify-content:space-between;gap:12px;margin-top:10px}.order-label{display:block;color:var(--muted);font-size:.64rem;text-transform:uppercase;letter-spacing:.08em;margin-bottom:3px}.order-total{color:var(--blue2);font-size:1.05rem}.order-actions{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:10px}.danger-outline{border-color:#efb0b8;color:#b62e3c;background:#fff5f6}.order-empty{padding:30px 12px}
+.mobile-bill-launcher{display:none}
+@media(max-width:760px){
+  .mobile-bill-launcher{
+    display:none;position:fixed;right:14px;bottom:14px;z-index:75;
+    min-width:170px;border:1px solid #a8d1ec;background:#fff;
+    color:var(--text);border-radius:14px;padding:9px 12px 10px;
+    box-shadow:0 14px 35px rgba(30,80,115,.18);
+    text-align:left;cursor:pointer;
+  }
+  .mobile-bill-launcher.show{display:grid;grid-template-columns:1fr auto;grid-template-rows:auto auto;gap:2px 10px;align-items:center}
+  .mobile-bill-launcher-label{font-size:.66rem;text-transform:uppercase;letter-spacing:.11em;color:var(--muted);font-weight:900}
+  .mobile-bill-launcher strong{font-size:1rem;color:var(--blue2);grid-row:1 / span 2;grid-column:2}
+  .mobile-bill-launcher-count{font-size:.72rem;color:var(--muted)}
+  .cart.mobile-hidden{display:none}
+}
+
 @media(max-width:760px){
   html{scroll-padding-top:72px}.topbar{height:64px;padding:10px 12px;gap:10px;z-index:90}.brand{gap:9px;min-width:0}.brand-title{font-size:.84rem}.brand-sub{font-size:.62rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:170px}.topbar>.status{margin-left:auto;max-width:150px;padding:7px 9px;font-size:.64rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .shell{display:flex;flex-direction:column;padding:12px 10px 28px;max-width:none}#billingSection{order:1}#dashboardSection{order:2}#inventorySection{order:3}#ordersSection{order:4}.section{margin-bottom:16px}
@@ -354,7 +370,7 @@ td strong{font-weight:800}
     </div>
   </div>
 
-  <aside class="panel cart">
+  <aside class="panel cart" id="billCart">
     <div class="cart-head">
       <div class="panel-head">
         <div><div class="eyebrow">CURRENT REQUEST</div><h2 id="billTitle">Bill</h2></div>
@@ -387,6 +403,12 @@ td strong{font-weight:800}
       <div id="billMessage" class="message"></div>
     </div>
   </aside>
+
+<button class="mobile-bill-launcher" id="mobileBillLauncher" type="button" aria-label="Open current bill">
+  <span class="mobile-bill-launcher-label">Current bill</span>
+  <strong id="mobileBillLauncherTotal">₹0</strong>
+  <span class="mobile-bill-launcher-count" id="mobileBillLauncherCount">0 items</span>
+</button>
 </section>
 
 <section class="panel table-panel" id="inventorySection">
@@ -403,7 +425,7 @@ td strong{font-weight:800}
 <section class="panel table-panel" id="ordersSection">
   <div class="panel-head">
     <div><div class="eyebrow">ORDER LOG</div><h2>Recent bills</h2></div>
-    <span style="color:var(--muted);font-size:.76rem">Edit restores old stock, applies the new bill, then refreshes all totals.</span>
+    <span id="ordersLogHint" style="color:var(--muted);font-size:.76rem">Showing latest 10 bills. Export Sales CSV for complete history.</span>
   </div>
   <div class="table-wrap" style="margin-top:12px">
     <table><thead><tr><th>Bill</th><th>Time</th><th>Items</th><th>Payment</th><th>Total</th><th>Status</th><th>Actions</th></tr></thead><tbody id="ordersBody"></tbody></table>
@@ -434,7 +456,8 @@ const state = {
   cart: [],
   category: "All",
   editingOrder: null,
-  inventorySku: null
+  inventorySku: null,
+  cartMinimized: false
 };
 
 // API connection
@@ -551,6 +574,7 @@ function adjustSingleSku(sku,delta){
   if(idx<0)return;
   state.cart[idx].qty=Math.max(0,Number(state.cart[idx].qty||0)+delta);
   if(!state.cart[idx].qty)state.cart.splice(idx,1);
+  openCurrentBill();
   renderCart();
   renderProducts();
 }
@@ -562,6 +586,7 @@ function addSingle(sku){
   const existing=state.cart.find(x=>x.kind==="single" && x.sku===sku);
   if(existing) existing.qty++;
   else state.cart.push({kind:"single",sku,qty:1});
+  openCurrentBill();
   renderCart();
   renderProducts();
 }
@@ -575,6 +600,7 @@ function addCombo(kind, flavor){
   const existing=state.cart.find(x=>(x.kind+(x.flavor||""))===key);
   if(existing) existing.qty++;
   else state.cart.push({kind, flavor, qty:1});
+  openCurrentBill();
   renderCart();
   renderProducts();
 }
@@ -592,6 +618,39 @@ function lineForItem(item){
     return {name:"Choco Pops — Same",unit:"combo",unitPrice:70,lineTotal:70*item.qty,meta:`2 ${item.flavor==="chana"?"Chana":"Peanuts"}`};
   }
   return {name:"Choco Pops — Different",unit:"combo",unitPrice:70,lineTotal:70*item.qty,meta:"1 Chana + 1 Peanuts"};
+}
+
+function syncMobileBillVisibility(){
+  const cart = $("billCart");
+  const launcher = $("mobileBillLauncher");
+  if(!cart || !launcher)return;
+  const isMobile = window.matchMedia("(max-width:760px)").matches;
+  if(!isMobile){
+    cart.classList.remove("mobile-hidden");
+    launcher.classList.remove("show");
+    return;
+  }
+  cart.classList.toggle("mobile-hidden", !!state.cartMinimized);
+  launcher.classList.toggle("show", !!state.cartMinimized);
+  const total = cartSubtotal();
+  const count = state.cart.reduce((sum,x)=>sum+Number(x.qty||0),0);
+  $("mobileBillLauncherTotal").textContent=money(total);
+  $("mobileBillLauncherCount").textContent=`${count} item${count===1?"":"s"}`;
+}
+function minimizeCurrentBill(){
+  state.cartMinimized=true;
+  syncMobileBillVisibility();
+}
+function openCurrentBill(){
+  state.cartMinimized=false;
+  syncMobileBillVisibility();
+}
+function handleCartClose(){
+  if(window.matchMedia("(max-width:760px)").matches){
+    minimizeCurrentBill();
+  }else{
+    clearCurrentBill();
+  }
 }
 
 function renderCart(){
@@ -621,6 +680,7 @@ function renderCart(){
   $("total").textContent=money(total);
   const paid=Number($("amountPaid").value||0);
   $("changeDue").textContent=money(Math.max(0,paid-total));
+  syncMobileBillVisibility();
 }
 
 function changeQty(i,d){
@@ -797,7 +857,12 @@ async function loadOrders(){
   const r=await api("/api/orders?date="+encodeURIComponent(day));
   const body=$("ordersBody"); body.innerHTML="";
   const mobile=$("ordersMobile"); mobile.innerHTML="";
-  r.orders.forEach(o=>{
+  const latestOrders = (r.orders || []).slice(0,10);
+  const hint=$("ordersLogHint");
+  if(hint) hint.textContent = latestOrders.length
+    ? `Showing latest ${latestOrders.length}${(r.orders||[]).length>10 ? " of "+r.orders.length : ""} bill${latestOrders.length===1?"":"s"}. Export Sales CSV for complete history.`
+    : "Showing latest 10 bills. Export Sales CSV for complete history.";
+  latestOrders.forEach(o=>{
     const itemText=o.items.map(i=>`${i.display_name} ×${i.qty}`).join(", ");
     const cls=o.status==="completed"?"ok":"void";
     const tr=document.createElement("tr");
@@ -893,7 +958,8 @@ document.querySelectorAll("[data-scroll]").forEach(b=>b.onclick=()=>{
   if(target)target.scrollIntoView({behavior:"smooth",block:"start"});
 });
 
-$("clearCart").onclick=clearCurrentBill;
+$("clearCart").onclick=handleCartClose;
+$("mobileBillLauncher").onclick=openCurrentBill;
 $("clearBill").onclick=clearCurrentBill;
 $("cancelEdit").onclick=clearCurrentBill;
 $("completeBill").onclick=submitBill;
@@ -908,6 +974,7 @@ $("exportExcel").onclick=()=>downloadUrl("/api/export/excel.xlsx");
 
 $("discount").addEventListener("input",renderCart);
 $("amountPaid").addEventListener("input",renderCart);
+window.addEventListener("resize",syncMobileBillVisibility);
 
 document.addEventListener("keydown",(e)=>{
   const target=e.target;
@@ -920,7 +987,7 @@ document.addEventListener("keydown",(e)=>{
   if(e.key==="Escape"){
     if($("inventoryModal").classList.contains("show")) closeInventory();
     else if($("sideMenu").classList.contains("show")) closeMenu();
-    else clearCurrentBill();
+    else handleCartClose();
     return;
   }
   // Never fire product shortcuts while typing in amount, discount, date, or any control.
