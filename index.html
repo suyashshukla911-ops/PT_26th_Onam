@@ -273,6 +273,202 @@ td strong{font-weight:800}
 }
 @media(max-width:360px){.topbar>.status{max-width:120px}.brand-sub{max-width:130px}.product{min-height:104px;padding:8px}.product-name{font-size:.69rem}.price{font-size:.76rem}.stock{font-size:.55rem}.in-cart{font-size:.52rem}.mini-add{padding:0 5px}}
 
+
+/* ===== Final mobile UX refinements ===== */
+.message{
+  min-height:0;
+  margin-top:8px;
+  padding:0;
+  border-radius:10px;
+  font-size:.78rem;
+  line-height:1.35;
+  transition:all .18s ease;
+}
+.message.error{
+  min-height:42px;
+  display:flex;
+  align-items:center;
+  padding:9px 11px;
+  color:#9d2835;
+  background:#fff0f2;
+  border:1px solid #efb7be;
+  font-weight:800;
+}
+.message.success{
+  color:var(--good);
+  font-weight:800;
+}
+input.invalid,select.invalid{
+  border-color:#df6875 !important;
+  background:#fff7f8 !important;
+  box-shadow:0 0 0 3px rgba(216,76,90,.10) !important;
+}
+.order-card-primary{
+  display:flex;
+  justify-content:space-between;
+  gap:12px;
+  margin-top:10px;
+}
+.order-details{
+  margin-top:10px;
+  border-top:1px solid var(--line);
+  padding-top:8px;
+}
+.order-details summary{
+  cursor:pointer;
+  list-style:none;
+  color:var(--blue2);
+  font-size:.75rem;
+  font-weight:900;
+  padding:7px 0;
+}
+.order-details summary::-webkit-details-marker{display:none}
+.order-details summary::after{
+  content:"＋";
+  float:right;
+  font-size:1rem;
+}
+.order-details[open] summary::after{content:"−"}
+.order-detail-list{
+  border-top:1px dashed var(--line);
+  padding-top:7px;
+}
+.order-detail-row{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+  gap:10px;
+  padding:7px 0;
+  font-size:.76rem;
+}
+.order-detail-row span{min-width:0}
+.order-detail-row small{
+  display:block;
+  margin-top:2px;
+  color:var(--muted);
+  font-size:.64rem;
+}
+.order-detail-summary{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:7px;
+  margin-top:7px;
+}
+.order-detail-summary div{
+  display:flex;
+  justify-content:space-between;
+  gap:8px;
+  padding:7px 8px;
+  background:#f7fbff;
+  border-radius:8px;
+  font-size:.68rem;
+}
+.order-detail-summary span{color:var(--muted)}
+.order-note{
+  margin-top:8px;
+  padding:8px;
+  border-radius:8px;
+  background:#fffaf0;
+  border:1px solid #f0ddaf;
+  font-size:.68rem;
+}
+.order-note span{
+  display:block;
+  color:var(--muted);
+  text-transform:uppercase;
+  letter-spacing:.08em;
+  font-weight:900;
+  margin-bottom:3px;
+}
+
+/* Mobile cards: keep all controls inside the card and make them easy to tap. */
+@media(max-width:760px){
+  .section{margin-bottom:11px}
+  .shell{padding-bottom:24px}
+  .dash{gap:7px;margin-top:7px}
+  .kpis{gap:7px;margin-top:9px}
+  .kpi{padding:11px}
+  .panel.pad{padding:11px}
+  .table-panel{padding:11px;margin-top:8px}
+  .mobile-list{gap:7px;margin-top:8px}
+
+  /* Billing should not reserve a large hidden-cart gap. */
+  #billingSection > .panel:first-child{padding-bottom:12px}
+  #billingSection.bill-overlay-open > .panel:first-child{padding-bottom:46vh}
+  #billingSection.bill-overlay-closed > .panel:first-child{padding-bottom:12px}
+
+  /* Keep all three catalog columns but stack controls vertically so
+     +/- controls can never spill outside the card. */
+  .products{grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;padding:7px}
+  .product{min-width:0;min-height:116px;padding:8px;border-radius:11px;overflow:hidden}
+  .product-head{gap:4px;align-items:flex-start}
+  .product-name{min-width:0;word-break:normal;overflow-wrap:anywhere;font-size:.72rem;line-height:1.13}
+  .price{flex:none;font-size:.78rem}
+  .unit{font-size:.6rem;margin-top:3px}
+  .stock{font-size:.55rem;line-height:1.2;margin-top:6px;overflow-wrap:anywhere}
+  .product-bottom{
+    display:grid;
+    grid-template-columns:1fr;
+    gap:5px;
+    margin-top:6px;
+    min-width:0;
+  }
+  .in-cart{
+    width:100%;
+    min-width:0;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    text-align:center;
+    font-size:.55rem;
+    padding:4px 5px;
+  }
+  .product-stepper{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    width:100%;
+    gap:4px;
+    min-width:0;
+  }
+  .mini-step,.mini-add{
+    width:100%;
+    min-width:0;
+    min-height:34px;
+    height:34px;
+    padding:0 4px;
+    font-size:.75rem;
+  }
+
+  /* Put Recent Bills immediately after billing on phones so a completed
+     sale can be verified without hunting at the bottom. */
+  #ordersSection{order:2}
+  #dashboardSection{order:3}
+  #inventorySection{order:4}
+
+  .order-card{padding:11px}
+  .order-card-primary{margin-top:8px}
+  .order-actions{margin-top:8px}
+  .order-empty{padding:18px 10px}
+
+  /* Keep the bill footer visible and make the error message impossible to miss. */
+  .cart{height:min(49vh,440px)}
+  .bill-foot{padding:9px 11px}
+  .message.error{min-height:44px;margin-bottom:7px}
+  .action-row{margin-top:7px}
+
+  /* More compact top-level spacing. */
+  .section-head h1{font-size:1.8rem}
+  .section-head .sub{font-size:.76rem}
+}
+@media(max-width:390px){
+  .products{gap:5px;padding:6px}
+  .product{min-height:112px;padding:7px}
+  .product-name{font-size:.68rem}
+  .price{font-size:.74rem}
+  .stock{font-size:.52rem}
+  .mini-step,.mini-add{min-height:32px;height:32px;font-size:.7rem}
+  .in-cart{font-size:.52rem}
+}
+
 </style>
 </head>
 <body>
@@ -396,11 +592,11 @@ td strong{font-weight:800}
         <div class="change"><span>Change</span><strong id="changeDue">₹0</strong></div>
       </div>
 
+      <div id="billMessage" class="message" aria-live="polite" role="status"></div>
       <div class="action-row">
         <button class="primary" id="completeBill">Complete bill <span style="opacity:.75">Ctrl + Enter</span></button>
         <button class="danger" id="clearBill">Clear</button>
       </div>
-      <div id="billMessage" class="message"></div>
     </div>
   </aside>
 
@@ -425,7 +621,7 @@ td strong{font-weight:800}
 <section class="panel table-panel" id="ordersSection">
   <div class="panel-head">
     <div><div class="eyebrow">ORDER LOG</div><h2>Recent bills</h2></div>
-    <span id="ordersLogHint" style="color:var(--muted);font-size:.76rem">Showing latest 10 bills. Export Sales CSV for complete history.</span>
+    <span id="ordersLogHint" style="color:var(--muted);font-size:.76rem">Latest 10 bills appear here automatically. Export Sales CSV for complete history.</span>
   </div>
   <div class="table-wrap" style="margin-top:12px">
     <table><thead><tr><th>Bill</th><th>Time</th><th>Items</th><th>Payment</th><th>Total</th><th>Status</th><th>Actions</th></tr></thead><tbody id="ordersBody"></tbody></table>
@@ -494,6 +690,13 @@ function toast(msg){
 function message(el,msg,error=false){
   el.textContent=msg || "";
   el.classList.toggle("error",!!error);
+  el.classList.toggle("success",!!msg && !error);
+  if(error && el.id==="billMessage"){
+    el.setAttribute("role","alert");
+    requestAnimationFrame(()=>el.scrollIntoView({behavior:"smooth",block:"nearest"}));
+  }else if(el.id==="billMessage"){
+    el.setAttribute("role","status");
+  }
 }
 
 async function loadMeta(){
@@ -623,15 +826,26 @@ function lineForItem(item){
 function syncMobileBillVisibility(){
   const cart = $("billCart");
   const launcher = $("mobileBillLauncher");
-  if(!cart || !launcher)return;
+  const billing = $("billingSection");
+  if(!cart || !launcher || !billing)return;
   const isMobile = window.matchMedia("(max-width:760px)").matches;
   if(!isMobile){
     cart.classList.remove("mobile-hidden");
     launcher.classList.remove("show");
+    billing.classList.remove("bill-overlay-open","bill-overlay-closed");
     return;
   }
+
+  // With an empty cart, start minimized on mobile so the product/catalog area
+  // does not have a large unused reserved space. Adding an item opens the bill.
+  if(!state.cart.length && !state.editingOrder){
+    state.cartMinimized=true;
+  }
+
   cart.classList.toggle("mobile-hidden", !!state.cartMinimized);
   launcher.classList.toggle("show", !!state.cartMinimized);
+  billing.classList.toggle("bill-overlay-open", !state.cartMinimized);
+  billing.classList.toggle("bill-overlay-closed", !!state.cartMinimized);
   const total = cartSubtotal();
   const count = state.cart.reduce((sum,x)=>sum+Number(x.qty||0),0);
   $("mobileBillLauncherTotal").textContent=money(total);
@@ -724,13 +938,29 @@ function loadCartFromOrder(order){
 }
 
 async function submitBill(){
-  if(!state.cart.length){message($("billMessage"),"Add at least one item.",true);return}
+  $("amountPaid").classList.remove("invalid");
+  $("discount").classList.remove("invalid");
+
+  if(!state.cart.length){message($("billMessage"),"Add at least one item to the bill before completing it.",true);return}
   const subtotal=cartSubtotal();
   const discount=Number($("discount").value||0);
   const paid=Number($("amountPaid").value||0);
-  if(discount<0 || discount>subtotal){message($("billMessage"),"Discount is invalid.",true);return}
+
+  if(discount<0 || discount>subtotal){
+    $("discount").classList.add("invalid");
+    message($("billMessage"),`Discount cannot be more than ${money(subtotal)} or less than ₹0.`,true);
+    $("discount").focus();
+    return;
+  }
+
   const total=Math.max(0,subtotal-discount);
-  if(paid<total){message($("billMessage"),`Amount received must be at least ${money(total)}.`,true);return}
+
+  if(paid<total){
+    $("amountPaid").classList.add("invalid");
+    message($("billMessage"),`Payment is short by ${money(total-paid)}. Amount received must be at least ${money(total)}. Nothing has been added to the bill.`,true);
+    $("amountPaid").focus();
+    return;
+  }
 
   const payload={
     items:state.cart,
@@ -857,32 +1087,99 @@ async function loadOrders(){
   const r=await api("/api/orders?date="+encodeURIComponent(day));
   const body=$("ordersBody"); body.innerHTML="";
   const mobile=$("ordersMobile"); mobile.innerHTML="";
-  const latestOrders = (r.orders || []).slice(0,10);
+  const allOrders = Array.isArray(r.orders) ? r.orders : [];
+  const latestOrders = allOrders.slice(0,10);
+
   const hint=$("ordersLogHint");
-  if(hint) hint.textContent = latestOrders.length
-    ? `Showing latest ${latestOrders.length}${(r.orders||[]).length>10 ? " of "+r.orders.length : ""} bill${latestOrders.length===1?"":"s"}. Export Sales CSV for complete history.`
-    : "Showing latest 10 bills. Export Sales CSV for complete history.";
+  if(hint){
+    hint.textContent = latestOrders.length
+      ? `Showing latest ${latestOrders.length}${allOrders.length>10 ? " of "+allOrders.length : ""} bill${latestOrders.length===1?"":"s"}. Export Sales CSV for complete history.`
+      : "No bills recorded for this event yet. Completed bills will appear here automatically.";
+  }
+
   latestOrders.forEach(o=>{
-    const itemText=o.items.map(i=>`${i.display_name} ×${i.qty}`).join(", ");
+    const itemText=(o.items||[]).map(i=>`${i.display_name} ×${i.qty}`).join(", ");
     const cls=o.status==="completed"?"ok":"void";
+
     const tr=document.createElement("tr");
-    tr.innerHTML=`<td><strong>${escapeHtml(o.order_no)}</strong></td><td>${formatDate(o.created_at)}</td><td style="max-width:360px">${escapeHtml(itemText)}</td><td>${escapeHtml(o.payment_mode)}</td><td><strong>${money(o.total)}</strong></td><td><span class="status-pill ${cls}">${escapeHtml(o.status)}</span></td><td><div class="actions">${o.status==="completed"?`<button class="small-btn" data-edit="${escapeAttr(o.order_no)}">Edit</button><button class="small-btn" data-void="${escapeAttr(o.order_no)}">Void</button>`:"—"}</div></td>`;
+    tr.innerHTML=`
+      <td><strong>${escapeHtml(o.order_no)}</strong></td>
+      <td>${formatDate(o.created_at)}</td>
+      <td style="max-width:360px">${escapeHtml(itemText || "No items")}</td>
+      <td>${escapeHtml(o.payment_mode||"—")}</td>
+      <td><strong>${money(o.total)}</strong></td>
+      <td><span class="status-pill ${cls}">${escapeHtml(o.status)}</span></td>
+      <td>
+        <div class="actions">
+          ${o.status==="completed"
+            ? `<button class="small-btn" data-edit="${escapeAttr(o.order_no)}">Edit</button>
+               <button class="small-btn" data-void="${escapeAttr(o.order_no)}">Void</button>`
+            : "—"}
+        </div>
+      </td>`;
     body.appendChild(tr);
+
+    const detailLines=(o.items||[]).map(i=>`
+      <div class="order-detail-row">
+        <span>
+          <strong>${escapeHtml(i.display_name)}</strong> ×${Number(i.qty||0)}
+          <small>${escapeHtml(i.meta || i.combo_detail || `${i.unit_price ?? ""} / ${i.unit ?? ""}`)}</small>
+        </span>
+        <strong>${money(i.line_total)}</strong>
+      </div>`).join("");
 
     const card=document.createElement("article");
     card.className="order-card";
-    const itemLines=o.items.map(i=>`<div class="order-item-line"><span>${escapeHtml(i.display_name)} ×${i.qty}</span><strong>${money(i.line_total)}</strong></div>`).join("");
     card.innerHTML=`
-      <div class="order-card-head"><div><span class="order-bill">${escapeHtml(o.order_no)}</span><span class="order-time">${formatDate(o.created_at)}</span></div><span class="status-pill ${cls}">${escapeHtml(o.status)}</span></div>
-      <div class="order-items">${itemLines || '<div class="order-muted">No items recorded</div>'}</div>
-      <div class="order-card-foot"><div><span class="order-label">Payment</span><strong>${escapeHtml(o.payment_mode)}</strong></div><div><span class="order-label">Total</span><strong class="order-total">${money(o.total)}</strong></div></div>
-      ${o.status==="completed"?`<div class="order-actions"><button class="small-btn" data-edit-mobile="${escapeAttr(o.order_no)}">Edit bill</button><button class="small-btn danger-outline" data-void-mobile="${escapeAttr(o.order_no)}">Void bill</button></div>`:""}`;
+      <div class="order-card-head">
+        <div>
+          <span class="order-bill">${escapeHtml(o.order_no)}</span>
+          <span class="order-time">${formatDate(o.created_at)}</span>
+        </div>
+        <span class="status-pill ${cls}">${escapeHtml(o.status)}</span>
+      </div>
+
+      <div class="order-card-primary">
+        <div>
+          <span class="order-label">Items</span>
+          <strong>${(o.items||[]).length} line${(o.items||[]).length===1?"":"s"}</strong>
+        </div>
+        <div>
+          <span class="order-label">Total</span>
+          <strong class="order-total">${money(o.total)}</strong>
+        </div>
+      </div>
+
+      <details class="order-details">
+        <summary>View complete bill</summary>
+        <div class="order-detail-list">
+          ${detailLines || '<div class="order-muted">No items recorded</div>'}
+        </div>
+        <div class="order-detail-summary">
+          <div><span>Subtotal</span><strong>${money(o.subtotal)}</strong></div>
+          <div><span>Discount</span><strong>${money(o.discount)}</strong></div>
+          <div><span>Payment</span><strong>${escapeHtml(o.payment_mode||"—")}</strong></div>
+          <div><span>Amount received</span><strong>${money(o.amount_paid)}</strong></div>
+          <div><span>Change</span><strong>${money(o.change_due)}</strong></div>
+          <div><span>Status</span><strong>${escapeHtml(o.status)}</strong></div>
+        </div>
+        ${o.notes ? `<div class="order-note"><span>Note</span>${escapeHtml(o.notes)}</div>` : ""}
+      </details>
+
+      ${o.status==="completed"
+        ? `<div class="order-actions">
+             <button class="small-btn" data-edit-mobile="${escapeAttr(o.order_no)}">Edit bill</button>
+             <button class="small-btn danger-outline" data-void-mobile="${escapeAttr(o.order_no)}">Void bill</button>
+           </div>`
+        : ""}`;
     mobile.appendChild(card);
   });
-  if(!r.orders.length){
-    body.innerHTML='<tr><td colspan="7"><div class="empty">No bills for this date.</div></td></tr>';
-    mobile.innerHTML='<div class="empty order-empty">No bills for this date.</div>';
+
+  if(!latestOrders.length){
+    body.innerHTML='<tr><td colspan="7"><div class="empty">No bills recorded for this event yet.</div></td></tr>';
+    mobile.innerHTML='<div class="empty order-empty">No bills recorded for this event yet.</div>';
   }
+
   body.querySelectorAll("[data-edit]").forEach(b=>b.onclick=()=>editOrder(b.dataset.edit));
   body.querySelectorAll("[data-void]").forEach(b=>b.onclick=()=>voidOrder(b.dataset.void));
   mobile.querySelectorAll("[data-edit-mobile]").forEach(b=>b.onclick=()=>editOrder(b.dataset.editMobile));
@@ -935,8 +1232,8 @@ function escapeHtml(v){
 function escapeAttr(v){return escapeHtml(v)}
 
 $("dashboardDate").addEventListener("change",async()=>{await loadDashboard();await loadOrders()});
-$("discount").addEventListener("input",renderCart);
-$("amountPaid").addEventListener("input",renderCart);
+$("discount").addEventListener("input",()=>{$("discount").classList.remove("invalid");renderCart()});
+$("amountPaid").addEventListener("input",()=>{$("amountPaid").classList.remove("invalid");renderCart()});
 function closeMenu(){
   $("sideMenu").classList.remove("show");
   $("menuOverlay").classList.remove("show");
@@ -972,8 +1269,8 @@ $("exportInventory").onclick=()=>downloadUrl("/api/export/inventory.csv");
 $("exportMovements").onclick=()=>downloadUrl("/api/export/inventory-movements.csv");
 $("exportExcel").onclick=()=>downloadUrl("/api/export/excel.xlsx");
 
-$("discount").addEventListener("input",renderCart);
-$("amountPaid").addEventListener("input",renderCart);
+$("discount").addEventListener("input",()=>{$("discount").classList.remove("invalid");renderCart()});
+$("amountPaid").addEventListener("input",()=>{$("amountPaid").classList.remove("invalid");renderCart()});
 window.addEventListener("resize",syncMobileBillVisibility);
 
 document.addEventListener("keydown",(e)=>{

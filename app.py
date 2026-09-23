@@ -714,10 +714,13 @@ def set_inventory(sku: str, new_stock: int, threshold: int) -> dict[str, Any]:
 # ---------------------------------------------------------------------
 
 def orders_for_date(day_text: str) -> list[dict[str, Any]]:
-    start, end = day_bounds_utc(day_text)
+    # This is a one-day event POS. Bills belong to the configured event date,
+    # not to the computer/server calendar date on which a test bill happens
+    # to be entered. This keeps test bills visible before the event date and
+    # keeps Recent Bills consistent with the event dashboard.
     rows = list(
         get_db().orders.find(
-            {"created_at": {"$gte": start, "$lt": end}},
+            {"event_date": day_text},
             {"_id": 0},
         ).sort("created_at", DESCENDING).limit(500)
     )
@@ -747,12 +750,14 @@ def sold_qty_map(day_text: str | None = None) -> dict[str, int]:
 
 
 def dashboard(day_text: str) -> dict[str, Any]:
-    start, end = day_bounds_utc(day_text)
     db = get_db()
 
+    # Event-day reporting uses the order's event_date. This is intentionally
+    # independent of created_at so test sales entered before the real event
+    # date still appear in the event POS, Recent Bills, and dashboard.
     orders = list(
         db.orders.find(
-            {"created_at": {"$gte": start, "$lt": end}, "status": "completed"},
+            {"event_date": day_text, "status": "completed"},
             {"total": 1, "items": 1, "payment_mode": 1},
         )
     )

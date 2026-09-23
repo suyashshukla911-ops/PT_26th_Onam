@@ -1355,3 +1355,17 @@ MongoDB Atlas
 ```
 
 This is the correct model for keeping the current frontend on GitHub Pages while running the Python + MongoDB backend separately.
+
+
+# Latest Mobile Refinement
+
+This build preserves the existing MongoDB/Render architecture and makes the following frontend/operational refinements:
+
+- Recent Bills now use the configured `event_date`, so bills created during testing before the real event date still appear under the event's bill log and dashboard.
+- Recent Bills are limited to the latest 10 visible records; full history remains available through Sales CSV.
+- Mobile bills have an expandable "View complete bill" section showing every bill line, subtotal, discount, payment mode, amount received, change, status, and notes.
+- Product plus/minus controls remain inside each product card at narrow mobile widths.
+- The mobile current-bill overlay does not reserve a large empty area when minimized.
+- The bill validation message is displayed in a prominent red alert area above the action buttons.
+- Underpayment no longer triggers any product addition; it only shows a clear shortage message and blocks submission.
+- The existing MongoDB connection, Render URL, API paths, pricing rules, transaction logic, exports, reset operation, and database collections remain unchanged.
