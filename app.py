@@ -793,9 +793,11 @@ def dashboard(day_text: str) -> dict[str, Any]:
         g["qty"] += row["qty"]
         g["revenue"] = money(g["revenue"] + row["revenue"])
 
+    # Products moving fastest are ranked by quantity sold, not revenue.
+    # Revenue remains available as a secondary tie-breaker.
     top_products = sorted(
         grouped.values(),
-        key=lambda x: (-x["revenue"], x["name"]),
+        key=lambda x: (-x["qty"], -x["revenue"], x["name"]),
     )[:8]
 
     payment_map: dict[str, dict[str, Any]] = {}

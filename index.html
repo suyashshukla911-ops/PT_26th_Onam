@@ -608,10 +608,85 @@ input.invalid,select.invalid{
 .qr-path-note{font-size:.72rem;line-height:1.5;color:var(--muted);margin-top:8px}
 .menu-link-qr{border-color:#c7e4f8;background:#f7fcff}
 @media(max-width:760px){
-  .payment-details[open] .payment-details-body{grid-template-columns:1fr}
+  .payment-details-visible .payment-details-body{grid-template-columns:1fr}
   .payment-details-body .change{grid-column:1}
   .qr-modal-card{padding:16px}
   .qr-image-wrap{width:min(280px,76vw)}
+}
+
+
+/* ===== Requested final checkout refinements ===== */
+.payment-details-visible{
+  margin-top:10px;
+  border:1px solid var(--line);
+  border-radius:12px;
+  background:#fff;
+  overflow:hidden;
+}
+.payment-details-head{
+  padding:11px 12px;
+  font-size:.76rem;
+  color:var(--text);
+  border-bottom:1px dashed var(--line);
+}
+.payment-details-visible .payment-details-body{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:8px;
+  padding:10px 10px 11px;
+}
+.payment-details-visible .payment-details-body label{
+  display:block;
+  font-size:.68rem;
+  color:var(--muted);
+  font-weight:800;
+}
+.payment-details-visible .payment-details-body input,
+.payment-details-visible .payment-details-body select{
+  margin-top:5px;
+}
+@media(max-width:760px){
+  /* Remove the counter/build-bill strip on mobile to recover space for products. */
+  .pos > .panel:first-child > .sticky{display:none}
+  .pos > .panel:first-child{padding-bottom:12px !important}
+
+  /* The Current Request is the checkout surface. It does not open when an item is added. */
+  .cart:not(.bill-collapsed){
+    height:min(78vh,720px);
+    max-height:calc(100dvh - 20px);
+  }
+  .cart:not(.bill-collapsed) .bill-expandable{
+    display:flex;
+    flex-direction:column;
+    min-height:0;
+  }
+  .cart:not(.bill-collapsed) .bill-expandable .cart-body{
+    flex:0 1 28vh;
+    min-height:92px;
+    max-height:28vh;
+    overflow-y:auto;
+    -webkit-overflow-scrolling:touch;
+  }
+  .cart:not(.bill-collapsed) .bill-expandable .bill-foot{
+    flex:1 1 auto;
+    min-height:0;
+    max-height:48vh;
+    overflow-y:auto;
+    -webkit-overflow-scrolling:touch;
+  }
+  .payment-details-visible .payment-details-body{
+    grid-template-columns:1fr 1fr;
+  }
+  .payment-details-visible .payment-details-body input,
+  .payment-details-visible .payment-details-body select{
+    min-height:44px;
+    font-size:.84rem;
+  }
+  .bill-expandable .message.error{scroll-margin-bottom:70px}
+}
+@media(max-width:390px){
+  .cart:not(.bill-collapsed){height:min(80vh,680px)}
+  .payment-details-visible .payment-details-body{grid-template-columns:1fr}
 }
 
 </style>
@@ -742,17 +817,14 @@ input.invalid,select.invalid{
           <div class="sum-row total total-live"><span>Total</span><strong id="total">₹0</strong></div>
         </div>
 
-        <details class="payment-details" id="paymentDetails">
-          <summary>
-            <span>Payment &amp; amount received</span>
-            <span class="payment-summary-inline"><strong id="paymentSummaryMode">UPI</strong><strong id="paymentSummaryReceived">₹0</strong><span class="payment-chevron" aria-hidden="true">⌄</span></span>
-          </summary>
+        <div class="payment-details payment-details-visible" id="paymentDetails">
+          <div class="payment-details-head"><strong>Payment &amp; amount received</strong></div>
           <div class="payment-details-body">
             <label>Payment<select id="paymentMode"><option selected>UPI</option><option>Cash</option></select></label>
             <label>Amount received<input id="amountPaid" type="number" min="0" step="1" placeholder="0" inputmode="numeric" autocomplete="off"></label>
             <div class="change"><span>Change</span><strong id="changeDue">₹0</strong></div>
           </div>
-        </details>
+        </div>
 
         <details class="discount-details" id="discountDetails">
           <summary>
@@ -882,7 +954,10 @@ function message(el,msg,error=false){
   el.classList.toggle("success",!!msg && !error);
   if(error && el.id==="billMessage"){
     el.setAttribute("role","alert");
-    requestAnimationFrame(()=>{const bill=$("billCart");if(bill)bill.scrollTo({top:bill.scrollHeight,behavior:"smooth"});});
+    requestAnimationFrame(()=>{
+      const foot=document.querySelector("#billCart .bill-foot");
+      if(foot)foot.scrollTo({top:foot.scrollHeight,behavior:"smooth"});
+    });
   }else if(el.id==="billMessage"){
     el.setAttribute("role","status");
   }
@@ -966,7 +1041,6 @@ function adjustSingleSku(sku,delta){
   if(idx<0)return;
   state.cart[idx].qty=Math.max(0,Number(state.cart[idx].qty||0)+delta);
   if(!state.cart[idx].qty)state.cart.splice(idx,1);
-  openCurrentBill();
   renderCart();
   renderProducts();
 }
@@ -978,7 +1052,6 @@ function addSingle(sku){
   const existing=state.cart.find(x=>x.kind==="single" && x.sku===sku);
   if(existing) existing.qty++;
   else state.cart.push({kind:"single",sku,qty:1});
-  openCurrentBill();
   renderCart();
   renderProducts();
 }
@@ -992,7 +1065,6 @@ function addCombo(kind, flavor){
   const existing=state.cart.find(x=>(x.kind+(x.flavor||""))===key);
   if(existing) existing.qty++;
   else state.cart.push({kind, flavor, qty:1});
-  openCurrentBill();
   renderCart();
   renderProducts();
 }
@@ -1035,8 +1107,8 @@ function syncMobileBillVisibility(){
   $("mobileBillLauncherCount").textContent=`${count} item${count===1?"":"s"}`;
   $("billHeaderTotal").textContent=money(total);
   $("billHeaderCount").textContent=`${count} item${count===1?"":"s"}`;
-  $("paymentSummaryReceived").textContent=money(Number($("amountPaid").value||0));
-  $("paymentSummaryMode").textContent=$("paymentMode").value||"Cash";
+
+
   $("billToggle").setAttribute("aria-expanded",state.billCollapsed?"false":"true");
   $("billCart").classList.toggle("bill-collapsed",!!state.billCollapsed);
 }
@@ -1096,8 +1168,8 @@ function renderCart(){
   $("total").textContent=money(total);
   const paid=Number($("amountPaid").value||0);
   $("changeDue").textContent=money(Math.max(0,paid-total));
-  $("paymentSummaryMode").textContent=$("paymentMode").value||"Cash";
-  $("paymentSummaryReceived").textContent=money(paid);
+
+
   $("billHeaderTotal").textContent=money(total);
   $("billHeaderCount").textContent=`${state.cart.reduce((sum,x)=>sum+Number(x.qty||0),0)} item${state.cart.reduce((sum,x)=>sum+Number(x.qty||0),0)===1?"":"s"}`;
   syncMobileBillVisibility();
@@ -1119,7 +1191,7 @@ function clearCurrentBill(){
   $("editingBanner").classList.remove("show");
   $("billTitle").textContent="Bill";
   $("completeBill").innerHTML="Complete bill <span style='opacity:.75'>Ctrl + Enter</span>";
-  $("discount").value=0;$("amountPaid").value="";$("paymentMode").value="UPI"; if($("paymentDetails"))$("paymentDetails").open=false; if($("discountDetails"))$("discountDetails").open=false;
+  $("discount").value=0;$("amountPaid").value="";$("paymentMode").value="UPI"; if($("discountDetails"))$("discountDetails").open=false;
   message($("billMessage"),"");
   renderCart();
   renderProducts();
@@ -1167,7 +1239,6 @@ async function submitBill(){
   if(paid<total){
     $("amountPaid").classList.add("invalid");
     openCurrentBill();
-    $("paymentDetails").open=true;
     message($("billMessage"),`Payment is short by ${money(total-paid)}. Amount received must be at least ${money(total)}. Nothing has been added to the bill.`,true);
     $("amountPaid").focus();
     return;
@@ -1272,10 +1343,11 @@ async function loadDashboard(){
   $("kpiInventory").textContent=money(d.inventory_value);
 
   const top=$("topProducts"); top.innerHTML="";
-  const max=Math.max(1,...d.top_products.map(x=>x.revenue));
+  const max=Math.max(1,...d.top_products.map(x=>Number(x.qty||0)));
   d.top_products.forEach(x=>{
+    const qty=Number(x.qty||0);
     const row=document.createElement("div"); row.innerHTML=`
-      <div class="bar-row"><div><div class="bar-label">${escapeHtml(x.name)}</div><div class="bar-track"><div class="bar-fill" style="width:${(x.revenue/max)*100}%"></div></div></div><div class="bar-num">${money(x.revenue)}</div></div>`;
+      <div class="bar-row"><div><div class="bar-label">${escapeHtml(x.name)}</div><div class="bar-track"><div class="bar-fill" style="width:${(qty/max)*100}%"></div></div></div><div class="bar-num">${qty} sold</div></div>`;
     top.appendChild(row);
   });
   if(!d.top_products.length)top.innerHTML='<div class="empty">No completed sales for this date.</div>';
