@@ -1363,6 +1363,14 @@ class Handler(BaseHTTPRequestHandler):
                 send_bytes(self, 204, b"", "text/plain")
                 return
 
+            if path == "/01.png":
+                qr_path = BASE_DIR / "01.png"
+                if not qr_path.exists():
+                    self.error(404, "QR image 01.png not found. Add it beside app.py.")
+                    return
+                send_bytes(self, 200, qr_path.read_bytes(), "image/png")
+                return
+
             if path == "/api/health":
                 self.json(200, mongo_health())
                 return

@@ -1369,3 +1369,22 @@ This build preserves the existing MongoDB/Render architecture and makes the foll
 - The bill validation message is displayed in a prominent red alert area above the action buttons.
 - Underpayment no longer triggers any product addition; it only shows a clear shortage message and blocks submission.
 - The existing MongoDB connection, Render URL, API paths, pricing rules, transaction logic, exports, reset operation, and database collections remain unchanged.
+
+
+## Latest UI refinement
+
+### Payment first / discount later
+The billing panel now shows the payment section before the optional discount section. Payment is open by default. The payment selector contains only `UPI` and `Cash`, in that order, with `UPI` selected by default.
+
+The optional discount is now inside a collapsed `Discount (optional)` dropdown. It can be opened when required without taking space during normal billing.
+
+### QR Code menu
+The Navigate menu now contains `Billing`, `Dashboard`, `Inventory`, `Receipts`, and `QR Code`.
+
+Place the QR/photo image here:
+
+```text
+PT_26th_Onam/01.png
+```
+
+The application serves this image at `/01.png`. Replace the included placeholder `01.png` with your actual QR/photo using the same filename. No MongoDB or Render configuration is changed by this feature.
