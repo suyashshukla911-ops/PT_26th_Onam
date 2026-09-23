@@ -217,10 +217,53 @@ td strong{font-weight:800}
   .kpis{grid-template-columns:1fr}
   .products{grid-template-columns:1fr}
 }
+
+/* ===== Mobile-first POS refinement ===== */
+.compatibility-hidden{display:none !important}
+.menu-btn{width:42px;height:42px;border:1px solid var(--line2);border-radius:12px;background:#fff;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:4px;flex:none}
+.menu-btn span{display:block;width:18px;height:2px;border-radius:2px;background:var(--text)}
+.menu-btn:hover{background:var(--blueSoft);border-color:var(--blue)}
+.menu-overlay{position:fixed;inset:0;background:rgba(17,45,68,.28);backdrop-filter:blur(3px);z-index:70;display:none}.menu-overlay.show{display:block}
+.side-menu{position:fixed;top:0;left:0;bottom:0;width:min(330px,88vw);background:#fff;z-index:80;transform:translateX(-105%);transition:transform .22s ease;box-shadow:18px 0 45px rgba(30,80,115,.16);display:flex;flex-direction:column;padding:18px 16px}.side-menu.show{transform:none}
+.side-menu-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;padding:5px 2px 18px;border-bottom:1px solid var(--line)}
+.menu-section{padding:18px 2px 2px}.menu-label{font-size:.66rem;letter-spacing:.15em;text-transform:uppercase;font-weight:900;color:var(--muted);margin-bottom:8px}
+.menu-link{width:100%;text-align:left;border:1px solid transparent;background:#fff;color:var(--text);border-radius:10px;padding:12px 12px;font-weight:800;margin:2px 0}.menu-link:hover{background:var(--blueSoft);border-color:var(--line)}
+.menu-danger-section{border-top:1px solid var(--line);margin-top:8px;padding-top:16px}.menu-reset{color:#b62e3c;border-color:#f2b5bb;background:#fff5f6}.menu-reset:hover{background:#ffe8eb}
+.menu-footer{margin-top:auto;padding:14px 2px 3px;color:var(--muted);font-size:.72rem;border-top:1px solid var(--line);line-height:1.6}
+.mobile-list{display:none}
+.product-bottom{display:flex;align-items:center;justify-content:space-between;gap:7px;margin-top:10px}.in-cart{font-size:.68rem;font-weight:900;color:#32698d;background:#eef8ff;border:1px solid #c6e5f7;padding:5px 7px;border-radius:999px;white-space:nowrap}.product-stepper{display:flex;align-items:center;gap:5px}
+.mini-step,.mini-add{height:30px;border:1px solid var(--line2);border-radius:8px;background:#fff;font-weight:900}.mini-step{width:30px}.mini-add{padding:0 9px;background:var(--blueSoft);color:var(--blue2)}.mini-step:disabled,.mini-add:disabled{opacity:.45;cursor:not-allowed}.product.sold-out{opacity:.5}
+.inventory-card,.order-card{border:1px solid var(--line);border-radius:14px;background:#fff;padding:13px;box-shadow:0 8px 24px rgba(48,103,145,.07)}
+.inventory-card-head,.order-card-head{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}.inventory-item-name,.order-bill{font-weight:900;color:var(--text)}.inventory-category,.order-time{display:block;color:var(--muted);font-size:.7rem;margin-top:3px}
+.inventory-facts{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:11px}.inventory-facts span{display:flex;justify-content:space-between;gap:8px;padding:8px;background:#f7fbff;border-radius:8px;font-size:.7rem;color:var(--muted)}.inventory-facts strong{color:var(--text)}.full-btn{width:100%;margin-top:10px;padding:9px}
+.order-items{margin-top:11px;padding:8px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}.order-item-line{display:flex;justify-content:space-between;gap:10px;padding:5px 0;font-size:.78rem}.order-muted{color:var(--muted);font-size:.75rem}
+.order-card-foot{display:flex;justify-content:space-between;gap:12px;margin-top:10px}.order-label{display:block;color:var(--muted);font-size:.64rem;text-transform:uppercase;letter-spacing:.08em;margin-bottom:3px}.order-total{color:var(--blue2);font-size:1.05rem}.order-actions{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:10px}.danger-outline{border-color:#efb0b8;color:#b62e3c;background:#fff5f6}.order-empty{padding:30px 12px}
+@media(max-width:760px){
+  html{scroll-padding-top:72px}.topbar{height:64px;padding:10px 12px;gap:10px;z-index:90}.brand{gap:9px;min-width:0}.brand-title{font-size:.84rem}.brand-sub{font-size:.62rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:170px}.topbar>.status{margin-left:auto;max-width:150px;padding:7px 9px;font-size:.64rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .shell{display:flex;flex-direction:column;padding:12px 10px 28px;max-width:none}#billingSection{order:1}#dashboardSection{order:2}#inventorySection{order:3}#ordersSection{order:4}.section{margin-bottom:16px}
+  .section-head{gap:9px}.section-head .sub{font-size:.8rem;line-height:1.42;margin-top:6px}.section-head h1{font-size:2rem}.date-pick{width:100%;justify-content:space-between;font-size:.74rem}.date-pick input{width:145px}
+  .kpis{grid-template-columns:repeat(2,1fr);gap:8px;margin-top:11px}.kpi{padding:12px;border-radius:14px}.kpi strong{font-size:1.25rem}.kpi small{font-size:.64rem}.dash{grid-template-columns:1fr;gap:9px;margin-top:9px}.panel.pad{padding:13px}
+  .pos{display:block}.pos > .panel:first-child{padding-bottom:48vh}.panel-section.sticky{position:sticky;top:63px;z-index:8}.panel-section{padding:13px}.panel-head h2{font-size:1rem}
+  .products{grid-template-columns:repeat(3,minmax(0,1fr));padding:9px;gap:7px}.product{min-height:108px;padding:9px;border-radius:12px}.product-name{font-size:.75rem;line-height:1.15}.price{font-size:.82rem}.unit{font-size:.64rem}.stock{font-size:.6rem;margin-top:8px;line-height:1.25}.product-bottom{margin-top:7px;gap:4px}.in-cart{font-size:.57rem;padding:4px 5px}.product-stepper{gap:3px}.mini-step,.mini-add{height:27px;font-size:.68rem}.mini-step{width:27px}.mini-add{padding:0 6px}
+  .combo{margin:0 9px 9px;padding:10px}.combo-title{font-size:.8rem}.combo-sub{font-size:.65rem;line-height:1.35}.combo-grid{grid-template-columns:repeat(3,1fr);gap:5px;margin-top:8px}.combo-btn{padding:8px;border-radius:9px;font-size:.66rem}.combo-btn span{font-size:.58rem}
+  .cart{position:fixed;left:10px;right:10px;bottom:10px;width:auto;min-height:0;height:min(46vh,420px);z-index:60;border-radius:16px;box-shadow:0 18px 50px rgba(30,80,115,.20);overflow:hidden}.cart-head{padding:12px 13px}.cart-body{padding:9px 12px;min-height:70px}.cart-item{padding:9px;margin-bottom:6px}.cart-item-name{font-size:.76rem}.cart-item-meta{font-size:.64rem}.qty-btn{width:27px;height:27px}.bill-foot{padding:10px 12px}.sum-row{font-size:.8rem}.total{font-size:1.05rem}.pay-grid{grid-template-columns:1fr 1fr;gap:7px;margin-top:9px}.pay-grid label{font-size:.67rem}.pay-grid input,.pay-grid select{padding:9px;font-size:.78rem}.change{padding:9px;font-size:.78rem}.action-row{grid-template-columns:1fr 86px;gap:7px}.primary,.danger{padding:11px 10px;font-size:.76rem}.primary span{display:none}
+  .table-panel{padding:13px;margin-top:11px}.table-panel>.table-wrap{display:none}.mobile-list{display:flex;flex-direction:column;gap:8px;margin-top:11px}#ordersSection .panel-head{display:block}#ordersSection .panel-head>span{display:block;margin-top:4px;line-height:1.35}
+  #inventorySection .panel-head .actions{margin-left:auto}#inventorySection .panel-head .small-btn{padding:7px 8px}.side-menu{width:min(320px,87vw)}
+}
+@media(max-width:760px) and (orientation:landscape){
+  .pos > .panel:first-child{padding-bottom:18px;margin-right:43vw}
+  .products{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .cart{left:auto;right:10px;top:74px;bottom:10px;width:40vw;height:auto;max-height:none}
+}
+@media(max-width:360px){.topbar>.status{max-width:120px}.brand-sub{max-width:130px}.product{min-height:104px;padding:8px}.product-name{font-size:.69rem}.price{font-size:.76rem}.stock{font-size:.55rem}.in-cart{font-size:.52rem}.mini-add{padding:0 5px}}
+
 </style>
 </head>
 <body>
 <header class="topbar">
+  <button class="menu-btn" id="menuBtn" aria-label="Open menu" aria-controls="sideMenu" aria-expanded="false">
+    <span></span><span></span><span></span>
+  </button>
   <div class="brand">
     <span class="brand-dot"></span>
     <div>
@@ -228,19 +271,42 @@ td strong{font-weight:800}
       <div class="brand-sub" id="eventMeta">Loading event…</div>
     </div>
   </div>
-  <div class="top-actions">
-    <button class="ghost" id="exportSales">Sales CSV</button>
-    <button class="ghost" id="exportInventory">Inventory CSV</button>
-    <button class="ghost" id="exportMovements">Movements CSV</button>
-    <button class="ghost" id="exportExcel">Excel</button>
-    <button class="danger" id="resetEvent">RESET EVENT</button>
-    <div class="status" id="dbStatus"><i></i> Checking MongoDB…</div>
-  </div>
+  <div class="status" id="dbStatus"><i></i> Checking MongoDB…</div>
 </header>
+
+<div class="menu-overlay" id="menuOverlay"></div>
+<aside class="side-menu" id="sideMenu" aria-hidden="true">
+  <div class="side-menu-head">
+    <div><div class="eyebrow">EVENT MENU</div><h2>Control centre</h2></div>
+    <button class="close menu-close" id="menuClose" aria-label="Close menu">×</button>
+  </div>
+  <div class="menu-section">
+    <div class="menu-label">Navigate</div>
+    <button class="menu-link" data-scroll="#billingSection">Billing</button>
+    <button class="menu-link" data-scroll="#dashboardSection">Dashboard</button>
+    <button class="menu-link" data-scroll="#inventorySection">Inventory</button>
+    <button class="menu-link" data-scroll="#ordersSection">Recent Bills</button>
+  </div>
+  <div class="menu-section">
+    <div class="menu-label">Exports</div>
+    <button class="menu-link" id="exportSales">Sales CSV</button>
+    <button class="menu-link" id="exportInventory">Inventory CSV</button>
+    <button class="menu-link" id="exportMovements">Movements CSV</button>
+    <button class="menu-link" id="exportExcel">Excel Report</button>
+  </div>
+  <div class="menu-section menu-danger-section">
+    <div class="menu-label">Testing</div>
+    <button class="menu-link menu-reset" id="resetEvent">Reset Event</button>
+  </div>
+  <div class="menu-footer">
+    <div>Internal POS</div>
+    <div>MongoDB-backed event data</div>
+  </div>
+</aside>
 
 <main class="shell">
 
-<section class="section">
+<section class="section" id="dashboardSection">
   <div class="section-head">
     <div>
       <div class="eyebrow">EVENT CONTROL</div>
@@ -265,7 +331,7 @@ td strong{font-weight:800}
   </div>
 </section>
 
-<section class="pos">
+<section class="pos" id="billingSection">
   <div class="panel">
     <div class="panel-section sticky">
       <div class="panel-head">
@@ -274,7 +340,7 @@ td strong{font-weight:800}
       </div>
     </div>
 
-    <div id="categoryTabs" class="tabs"></div>
+    <div id="categoryTabs" class="tabs compatibility-hidden"></div>
     <div id="productGrid" class="products"></div>
 
     <div class="combo">
@@ -305,7 +371,7 @@ td strong{font-weight:800}
       <div class="summary">
         <div class="sum-row"><span>Subtotal</span><strong id="subtotal">₹0</strong></div>
         <div class="sum-row"><span>Discount</span><label style="display:flex;align-items:center;gap:5px">₹<input id="discount" type="number" min="0" step="1" value="0" style="width:100px;padding:7px"></label></div>
-        <div class="sum-row total"><span>Total</span><strong id="total">₹0</strong></div>
+        <div class="sum-row total total-live"><span>Total</span><strong id="total">₹0</strong></div>
       </div>
 
       <div class="pay-grid">
@@ -323,7 +389,7 @@ td strong{font-weight:800}
   </aside>
 </section>
 
-<section class="panel table-panel">
+<section class="panel table-panel" id="inventorySection">
   <div class="panel-head">
     <div><div class="eyebrow">INVENTORY CONTROL</div><h2>Stock by item</h2></div>
     <div class="actions"><button class="small-btn" id="refreshAll">Refresh now</button></div>
@@ -331,9 +397,10 @@ td strong{font-weight:800}
   <div class="table-wrap" style="margin-top:12px">
     <table><thead><tr><th>Item</th><th>Category</th><th>Sale Price</th><th>Opening</th><th>Current</th><th>Sold</th><th>Low at</th><th>Status</th><th>Action</th></tr></thead><tbody id="inventoryBody"></tbody></table>
   </div>
+  <div id="inventoryMobile" class="mobile-list"></div>
 </section>
 
-<section class="panel table-panel">
+<section class="panel table-panel" id="ordersSection">
   <div class="panel-head">
     <div><div class="eyebrow">ORDER LOG</div><h2>Recent bills</h2></div>
     <span style="color:var(--muted);font-size:.76rem">Edit restores old stock, applies the new bill, then refreshes all totals.</span>
@@ -341,6 +408,7 @@ td strong{font-weight:800}
   <div class="table-wrap" style="margin-top:12px">
     <table><thead><tr><th>Bill</th><th>Time</th><th>Items</th><th>Payment</th><th>Total</th><th>Status</th><th>Actions</th></tr></thead><tbody id="ordersBody"></tbody></table>
   </div>
+  <div id="ordersMobile" class="mobile-list"></div>
 </section>
 
 </main>
@@ -433,35 +501,58 @@ async function loadProducts(){
 }
 
 function renderTabs(){
+  // Category filters intentionally disabled for the mobile POS.
   const tabs=$("categoryTabs");
-  tabs.innerHTML="";
-  const cats=state.meta?.categories || ["All"];
-  for(const cat of cats){
-    const b=document.createElement("button");
-    b.className="tab"+(state.category===cat?" active":"");
-    b.textContent=cat;
-    b.onclick=()=>{state.category=cat;renderTabs();renderProducts();};
-    tabs.appendChild(b);
-  }
+  if(tabs) tabs.innerHTML="";
 }
 
 function renderProducts(){
   const grid=$("productGrid");
   grid.innerHTML="";
-  let list=state.products;
-  if(state.category!=="All") list=list.filter(p=>p.category===state.category);
+  // Complete catalog is always visible; category filters are intentionally removed.
+  const list=state.products;
   list.forEach((p,i)=>{
-    const b=document.createElement("button");
+    const b=document.createElement("div");
     b.className="product";
-    b.disabled=Number(p.current_stock)<=0;
     b.dataset.quick=i+1;
+    b.tabIndex=0;
+    const inCart=state.cart.filter(x=>x.kind==="single" && x.sku===p.sku).reduce((sum,x)=>sum+Number(x.qty||0),0);
+    const disabled=Number(p.current_stock)<=0;
+    if(disabled)b.classList.add("sold-out");
     b.innerHTML=`
       <div class="product-head"><div class="product-name">${escapeHtml(p.name)}</div><div class="price">${money(p.price)}</div></div>
       <div class="unit">per ${escapeHtml(p.unit)}</div>
-      <div class="stock">Stock: ${p.current_stock} ${escapeHtml(p.unit)} · Low at ${p.low_stock_threshold}</div>`;
-    b.onclick=()=>addSingle(p.sku);
+      <div class="stock">Stock: ${p.current_stock} ${escapeHtml(p.unit)} · Low at ${p.low_stock_threshold}</div>
+      <div class="product-bottom">
+        <span class="in-cart">In order: ${inCart}</span>
+        <div class="product-stepper">
+          <button class="mini-step" data-product-minus="${escapeAttr(p.sku)}" ${inCart<=0?"disabled":""} aria-label="Remove one ${escapeAttr(p.name)}">−</button>
+          <button class="mini-add" data-product-plus="${escapeAttr(p.sku)}" ${disabled?"disabled":""}>+1</button>
+        </div>
+      </div>`;
+    b.onclick=(e)=>{
+      if(e.target.closest("button"))return;
+      if(!disabled)addSingle(p.sku);
+    };
+    b.onkeydown=(e)=>{
+      if((e.key==="Enter"||e.key===" ")&&!e.target.closest("button")){
+        e.preventDefault();
+        if(!disabled)addSingle(p.sku);
+      }
+    };
     grid.appendChild(b);
   });
+  grid.querySelectorAll("[data-product-plus]").forEach(btn=>btn.onclick=(e)=>{e.stopPropagation();addSingle(btn.dataset.productPlus);});
+  grid.querySelectorAll("[data-product-minus]").forEach(btn=>btn.onclick=(e)=>{e.stopPropagation();adjustSingleSku(btn.dataset.productMinus,-1);});
+}
+
+function adjustSingleSku(sku,delta){
+  const idx=state.cart.findIndex(x=>x.kind==="single" && x.sku===sku);
+  if(idx<0)return;
+  state.cart[idx].qty=Math.max(0,Number(state.cart[idx].qty||0)+delta);
+  if(!state.cart[idx].qty)state.cart.splice(idx,1);
+  renderCart();
+  renderProducts();
 }
 
 function addSingle(sku){
@@ -472,15 +563,20 @@ function addSingle(sku){
   if(existing) existing.qty++;
   else state.cart.push({kind:"single",sku,qty:1});
   renderCart();
+  renderProducts();
 }
 
 function addCombo(kind, flavor){
-  if(!state.products.find(x=>x.sku==="choco-pops")) return;
+  const stock=state.products.find(x=>x.sku==="choco-pops");
+  if(!stock){toast("Choco Pops stock is unavailable.");return;}
+  const used=state.cart.filter(x=>x.kind.startsWith("choco_combo")).reduce((sum,x)=>sum+Number(x.qty||0)*2,0);
+  if(used+2>Number(stock.current_stock)){toast("Not enough Choco Pops stock for this combo.");return;}
   const key=kind+(flavor||"");
   const existing=state.cart.find(x=>(x.kind+(x.flavor||""))===key);
   if(existing) existing.qty++;
   else state.cart.push({kind, flavor, qty:1});
   renderCart();
+  renderProducts();
 }
 
 document.querySelectorAll(".combo-btn").forEach(b=>{
@@ -516,7 +612,7 @@ function renderCart(){
     });
     box.querySelectorAll("[data-minus]").forEach(b=>b.onclick=()=>changeQty(Number(b.dataset.minus),-1));
     box.querySelectorAll("[data-plus]").forEach(b=>b.onclick=()=>changeQty(Number(b.dataset.plus),1));
-    box.querySelectorAll("[data-remove]").forEach(b=>b.onclick=()=>{state.cart.splice(Number(b.dataset.remove),1);renderCart();});
+    box.querySelectorAll("[data-remove]").forEach(b=>b.onclick=()=>{state.cart.splice(Number(b.dataset.remove),1);renderCart();renderProducts();});
   }
   const subtotal=cartSubtotal();
   $("subtotal").textContent=money(subtotal);
@@ -532,6 +628,7 @@ function changeQty(i,d){
   item.qty=Math.max(0,item.qty+d);
   if(!item.qty) state.cart.splice(i,1);
   renderCart();
+  renderProducts();
 }
 
 function cartSubtotal(){return state.cart.reduce((sum,x)=>sum+lineForItem(x).lineTotal,0)}
@@ -544,6 +641,7 @@ function clearCurrentBill(){
   $("discount").value=0;$("amountPaid").value="";
   message($("billMessage"),"");
   renderCart();
+  renderProducts();
 }
 
 function loadCartFromOrder(order){
@@ -614,23 +712,24 @@ async function voidOrder(orderNo){
 
 function renderInventory(){
   const body=$("inventoryBody"); body.innerHTML="";
+  const mobile=$("inventoryMobile"); mobile.innerHTML="";
   state.products.forEach(p=>{
-    const tr=document.createElement("tr");
     const status=p.current_stock===0?"OUT OF STOCK":p.current_stock<=p.low_stock_threshold?"LOW":"OK";
     const cls=status==="OK"?"ok":status==="LOW"?"warn":"void";
-    tr.innerHTML=`
-      <td><strong>${escapeHtml(p.name)}</strong></td>
-      <td>${escapeHtml(p.category)}</td>
-      <td>${money(p.price)}</td>
-      <td>${p.opening_stock}</td>
-      <td><strong>${p.current_stock}</strong></td>
-      <td>${p.sold_qty ?? "—"}</td>
-      <td>${p.low_stock_threshold}</td>
-      <td><span class="status-pill ${cls}">${status}</span></td>
-      <td><button class="small-btn" data-stock="${escapeAttr(p.sku)}">Edit stock</button></td>`;
+    const tr=document.createElement("tr");
+    tr.innerHTML=`<td><strong>${escapeHtml(p.name)}</strong></td><td>${escapeHtml(p.category)}</td><td>${money(p.price)}</td><td>${p.opening_stock}</td><td><strong>${p.current_stock}</strong></td><td>${p.sold_qty ?? "—"}</td><td>${p.low_stock_threshold}</td><td><span class="status-pill ${cls}">${status}</span></td><td><button class="small-btn" data-stock="${escapeAttr(p.sku)}">Edit stock</button></td>`;
     body.appendChild(tr);
+
+    const card=document.createElement("article");
+    card.className="inventory-card";
+    card.innerHTML=`
+      <div class="inventory-card-head"><div><div class="inventory-item-name">${escapeHtml(p.name)}</div><div class="inventory-category">${escapeHtml(p.category)}</div></div><span class="status-pill ${cls}">${status}</span></div>
+      <div class="inventory-facts"><span>Sale <strong>${money(p.price)}</strong></span><span>Current <strong>${p.current_stock}</strong></span><span>Sold <strong>${p.sold_qty ?? 0}</strong></span><span>Low at <strong>${p.low_stock_threshold}</strong></span></div>
+      <button class="small-btn full-btn" data-stock-mobile="${escapeAttr(p.sku)}">Edit stock</button>`;
+    mobile.appendChild(card);
   });
   body.querySelectorAll("[data-stock]").forEach(b=>b.onclick=()=>openInventory(b.dataset.stock));
+  mobile.querySelectorAll("[data-stock-mobile]").forEach(b=>b.onclick=()=>openInventory(b.dataset.stockMobile));
 }
 
 function openInventory(sku){
@@ -696,24 +795,33 @@ async function loadDashboard(){
 async function loadOrders(){
   const day=$("dashboardDate").value || today();
   const r=await api("/api/orders?date="+encodeURIComponent(day));
-  const body=$("ordersBody");body.innerHTML="";
+  const body=$("ordersBody"); body.innerHTML="";
+  const mobile=$("ordersMobile"); mobile.innerHTML="";
   r.orders.forEach(o=>{
     const itemText=o.items.map(i=>`${i.display_name} ×${i.qty}`).join(", ");
     const cls=o.status==="completed"?"ok":"void";
     const tr=document.createElement("tr");
-    tr.innerHTML=`
-      <td><strong>${escapeHtml(o.order_no)}</strong></td>
-      <td>${formatDate(o.created_at)}</td>
-      <td style="max-width:360px">${escapeHtml(itemText)}</td>
-      <td>${escapeHtml(o.payment_mode)}</td>
-      <td><strong>${money(o.total)}</strong></td>
-      <td><span class="status-pill ${cls}">${escapeHtml(o.status)}</span></td>
-      <td><div class="actions">${o.status==="completed"?`<button class="small-btn" data-edit="${escapeAttr(o.order_no)}">Edit</button><button class="small-btn" data-void="${escapeAttr(o.order_no)}">Void</button>`:"—"}</div></td>`;
+    tr.innerHTML=`<td><strong>${escapeHtml(o.order_no)}</strong></td><td>${formatDate(o.created_at)}</td><td style="max-width:360px">${escapeHtml(itemText)}</td><td>${escapeHtml(o.payment_mode)}</td><td><strong>${money(o.total)}</strong></td><td><span class="status-pill ${cls}">${escapeHtml(o.status)}</span></td><td><div class="actions">${o.status==="completed"?`<button class="small-btn" data-edit="${escapeAttr(o.order_no)}">Edit</button><button class="small-btn" data-void="${escapeAttr(o.order_no)}">Void</button>`:"—"}</div></td>`;
     body.appendChild(tr);
+
+    const card=document.createElement("article");
+    card.className="order-card";
+    const itemLines=o.items.map(i=>`<div class="order-item-line"><span>${escapeHtml(i.display_name)} ×${i.qty}</span><strong>${money(i.line_total)}</strong></div>`).join("");
+    card.innerHTML=`
+      <div class="order-card-head"><div><span class="order-bill">${escapeHtml(o.order_no)}</span><span class="order-time">${formatDate(o.created_at)}</span></div><span class="status-pill ${cls}">${escapeHtml(o.status)}</span></div>
+      <div class="order-items">${itemLines || '<div class="order-muted">No items recorded</div>'}</div>
+      <div class="order-card-foot"><div><span class="order-label">Payment</span><strong>${escapeHtml(o.payment_mode)}</strong></div><div><span class="order-label">Total</span><strong class="order-total">${money(o.total)}</strong></div></div>
+      ${o.status==="completed"?`<div class="order-actions"><button class="small-btn" data-edit-mobile="${escapeAttr(o.order_no)}">Edit bill</button><button class="small-btn danger-outline" data-void-mobile="${escapeAttr(o.order_no)}">Void bill</button></div>`:""}`;
+    mobile.appendChild(card);
   });
-  if(!r.orders.length)body.innerHTML='<tr><td colspan="7"><div class="empty">No bills for this date.</div></td></tr>';
+  if(!r.orders.length){
+    body.innerHTML='<tr><td colspan="7"><div class="empty">No bills for this date.</div></td></tr>';
+    mobile.innerHTML='<div class="empty order-empty">No bills for this date.</div>';
+  }
   body.querySelectorAll("[data-edit]").forEach(b=>b.onclick=()=>editOrder(b.dataset.edit));
   body.querySelectorAll("[data-void]").forEach(b=>b.onclick=()=>voidOrder(b.dataset.void));
+  mobile.querySelectorAll("[data-edit-mobile]").forEach(b=>b.onclick=()=>editOrder(b.dataset.editMobile));
+  mobile.querySelectorAll("[data-void-mobile]").forEach(b=>b.onclick=()=>voidOrder(b.dataset.voidMobile));
 }
 
 async function refreshAll(){
@@ -764,6 +872,27 @@ function escapeAttr(v){return escapeHtml(v)}
 $("dashboardDate").addEventListener("change",async()=>{await loadDashboard();await loadOrders()});
 $("discount").addEventListener("input",renderCart);
 $("amountPaid").addEventListener("input",renderCart);
+function closeMenu(){
+  $("sideMenu").classList.remove("show");
+  $("menuOverlay").classList.remove("show");
+  $("menuBtn").setAttribute("aria-expanded","false");
+  $("sideMenu").setAttribute("aria-hidden","true");
+}
+function openMenu(){
+  $("sideMenu").classList.add("show");
+  $("menuOverlay").classList.add("show");
+  $("menuBtn").setAttribute("aria-expanded","true");
+  $("sideMenu").setAttribute("aria-hidden","false");
+}
+$("menuBtn").onclick=openMenu;
+$("menuClose").onclick=closeMenu;
+$("menuOverlay").onclick=closeMenu;
+document.querySelectorAll("[data-scroll]").forEach(b=>b.onclick=()=>{
+  const target=document.querySelector(b.dataset.scroll);
+  closeMenu();
+  if(target)target.scrollIntoView({behavior:"smooth",block:"start"});
+});
+
 $("clearCart").onclick=clearCurrentBill;
 $("clearBill").onclick=clearCurrentBill;
 $("cancelEdit").onclick=clearCurrentBill;
@@ -777,21 +906,34 @@ $("exportInventory").onclick=()=>downloadUrl("/api/export/inventory.csv");
 $("exportMovements").onclick=()=>downloadUrl("/api/export/inventory-movements.csv");
 $("exportExcel").onclick=()=>downloadUrl("/api/export/excel.xlsx");
 
+$("discount").addEventListener("input",renderCart);
+$("amountPaid").addEventListener("input",renderCart);
+
 document.addEventListener("keydown",(e)=>{
-  if(e.ctrlKey&&e.key==="Enter"){e.preventDefault();submitBill()}
+  const target=e.target;
+  const typing=target && (target.matches("input, textarea, select, button") || target.isContentEditable);
+  if(e.ctrlKey&&e.key==="Enter"){
+    e.preventDefault();
+    submitBill();
+    return;
+  }
   if(e.key==="Escape"){
     if($("inventoryModal").classList.contains("show")) closeInventory();
+    else if($("sideMenu").classList.contains("show")) closeMenu();
     else clearCurrentBill();
+    return;
   }
+  // Never fire product shortcuts while typing in amount, discount, date, or any control.
+  if(typing)return;
   if(!e.ctrlKey&&!e.altKey&&!e.metaKey){
     const n=Number(e.key);
     if(n>=1&&n<=9){
-      const btn=[...document.querySelectorAll(".product")][n-1];
-      if(btn&&!btn.disabled)btn.click();
+      const card=[...document.querySelectorAll(".product")][n-1];
+      if(card)card.click();
     }
     if(e.key==="0"){
-      const btn=[...document.querySelectorAll(".product")][9];
-      if(btn&&!btn.disabled)btn.click();
+      const card=[...document.querySelectorAll(".product")][9];
+      if(card)card.click();
     }
   }
 });
