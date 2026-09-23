@@ -742,7 +742,7 @@ input.invalid,select.invalid{
           <div class="sum-row total total-live"><span>Total</span><strong id="total">₹0</strong></div>
         </div>
 
-        <details class="payment-details" id="paymentDetails" open>
+        <details class="payment-details" id="paymentDetails">
           <summary>
             <span>Payment &amp; amount received</span>
             <span class="payment-summary-inline"><strong id="paymentSummaryMode">UPI</strong><strong id="paymentSummaryReceived">₹0</strong><span class="payment-chevron" aria-hidden="true">⌄</span></span>
@@ -1119,7 +1119,7 @@ function clearCurrentBill(){
   $("editingBanner").classList.remove("show");
   $("billTitle").textContent="Bill";
   $("completeBill").innerHTML="Complete bill <span style='opacity:.75'>Ctrl + Enter</span>";
-  $("discount").value=0;$("amountPaid").value="";$("paymentMode").value="UPI"; if($("paymentDetails"))$("paymentDetails").open=true; if($("discountDetails"))$("discountDetails").open=false;
+  $("discount").value=0;$("amountPaid").value="";$("paymentMode").value="UPI"; if($("paymentDetails"))$("paymentDetails").open=false; if($("discountDetails"))$("discountDetails").open=false;
   message($("billMessage"),"");
   renderCart();
   renderProducts();
@@ -1135,6 +1135,8 @@ function loadCartFromOrder(order){
   $("discount").value=Number(order.discount||0);
   $("amountPaid").value=Number(order.amount_paid||0);
   $("paymentMode").value=order.payment_mode||"UPI";
+  if($("paymentDetails"))$("paymentDetails").open=false;
+  if($("discountDetails"))$("discountDetails").open=false;
   state.editingOrder=order.order_no;
   $("editingNo").textContent=order.order_no;
   $("editingBanner").classList.add("show");
