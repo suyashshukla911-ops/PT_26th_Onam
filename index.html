@@ -239,10 +239,36 @@ td strong{font-weight:800}
 .order-items{margin-top:11px;padding:8px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}.order-item-line{display:flex;justify-content:space-between;gap:10px;padding:5px 0;font-size:.78rem}.order-muted{color:var(--muted);font-size:.75rem}
 .order-card-foot{display:flex;justify-content:space-between;gap:12px;margin-top:10px}.order-label{display:block;color:var(--muted);font-size:.64rem;text-transform:uppercase;letter-spacing:.08em;margin-bottom:3px}.order-total{color:var(--blue2);font-size:1.05rem}.order-actions{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:10px}.danger-outline{border-color:#efb0b8;color:#b62e3c;background:#fff5f6}.order-empty{padding:30px 12px}
 .mobile-bill-launcher{display:none}
+
+/* Current bill accordion + payment accordion */
+.bill-toggle{
+  flex:1;min-width:0;border:0;background:transparent;padding:0;text-align:left;color:var(--text);
+  display:flex;align-items:center;justify-content:space-between;gap:12px;cursor:pointer;
+}
+.bill-toggle-copy{display:flex;flex-direction:column;min-width:0}
+.bill-toggle-title{display:block;font-size:1.06rem;font-weight:900;line-height:1.15;margin-top:3px}
+.bill-toggle-meta{display:flex;align-items:center;gap:8px;flex:none}
+.bill-toggle-meta strong:first-child{color:var(--blue2);font-size:.95rem}
+.bill-toggle-meta span:nth-child(2){color:var(--muted);font-size:.7rem;white-space:nowrap}
+.bill-chevron,.payment-chevron{font-size:1rem;transition:transform .18s ease;color:var(--muted)}
+.bill-toggle[aria-expanded="true"] .bill-chevron{transform:rotate(180deg)}
+.bill-expandable{display:block;min-height:0}
+.bill-expandable.collapsed{display:none}
+.payment-details{margin-top:10px;border:1px solid var(--line);border-radius:12px;background:#fff;overflow:hidden}
+.payment-details summary{list-style:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 11px;font-size:.73rem;font-weight:900;color:var(--text)}
+.payment-details summary::-webkit-details-marker{display:none}
+.payment-summary-inline{display:flex;align-items:center;gap:7px;white-space:nowrap}
+.payment-summary-inline strong:first-child{color:var(--blue2)}
+.payment-summary-inline strong:nth-child(2){color:var(--text)}
+.payment-details[open] .payment-chevron{transform:rotate(180deg)}
+.payment-details-body{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:0 10px 10px;border-top:1px dashed var(--line)}
+.payment-details-body label{font-size:.68rem;color:var(--muted);font-weight:800}
+.payment-details-body input,.payment-details-body select{margin-top:5px}
+.payment-details-body .change{grid-column:1/-1}
 @media(max-width:760px){
   .mobile-bill-launcher{
-    display:none;position:fixed;right:14px;bottom:14px;z-index:75;
-    min-width:170px;border:1px solid #a8d1ec;background:#fff;
+    display:none;position:fixed;right:14px;bottom:calc(14px + env(safe-area-inset-bottom));z-index:9999 !important;
+    min-width:170px;border:1px solid #8fbfe0;background:#fff;pointer-events:auto !important;touch-action:manipulation;-webkit-tap-highlight-color:transparent;
     color:var(--text);border-radius:14px;padding:9px 12px 10px;
     box-shadow:0 14px 35px rgba(30,80,115,.18);
     text-align:left;cursor:pointer;
@@ -272,6 +298,21 @@ td strong{font-weight:800}
   .cart{left:auto;right:10px;top:74px;bottom:10px;width:40vw;height:auto;max-height:none}
 }
 @media(max-width:360px){.topbar>.status{max-width:120px}.brand-sub{max-width:130px}.product{min-height:104px;padding:8px}.product-name{font-size:.69rem}.price{font-size:.76rem}.stock{font-size:.55rem}.in-cart{font-size:.52rem}.mini-add{padding:0 5px}}
+
+/* Strong mobile bill interaction safeguards */
+@media(max-width:760px){
+  .cart-head{padding:10px 11px}.cart-head .panel-head{align-items:center;gap:8px}
+  .bill-toggle{min-height:42px}.bill-toggle-meta{gap:5px}.bill-toggle-meta strong:first-child{font-size:.88rem}.bill-toggle-meta span:nth-child(2){font-size:.64rem}
+  .bill-expandable{max-height:58vh;overflow:hidden}
+  .bill-expandable .cart-body{max-height:29vh;overflow-y:auto;-webkit-overflow-scrolling:touch}
+  .bill-expandable .bill-foot{max-height:35vh;overflow-y:auto;-webkit-overflow-scrolling:touch}
+  .payment-details summary{min-height:42px}.payment-details-body input,.payment-details-body select{min-height:42px;font-size:.82rem}
+  .action-row{position:sticky;bottom:0;padding-top:6px;background:#fbfdff}
+  .mobile-bill-launcher{min-height:52px;padding:9px 13px;border-radius:15px;box-shadow:0 15px 40px rgba(30,80,115,.22),0 2px 7px rgba(30,80,115,.10)}
+  .mobile-bill-launcher:active{transform:scale(.985)}
+  #ordersSection{order:2}#dashboardSection{order:3}#inventorySection{order:4}
+}
+
 
 
 /* ===== Final mobile UX refinements ===== */
@@ -569,33 +610,51 @@ input.invalid,select.invalid{
   <aside class="panel cart" id="billCart">
     <div class="cart-head">
       <div class="panel-head">
-        <div><div class="eyebrow">CURRENT REQUEST</div><h2 id="billTitle">Bill</h2></div>
-        <button class="close" id="clearCart" title="Clear current bill">×</button>
+        <button class="bill-toggle" id="billToggle" type="button" aria-expanded="true" aria-controls="billExpandable">
+          <span class="bill-toggle-copy">
+            <span class="eyebrow">CURRENT REQUEST</span>
+            <span class="bill-toggle-title" id="billTitle">Bill</span>
+          </span>
+          <span class="bill-toggle-meta">
+            <strong id="billHeaderTotal">₹0</strong>
+            <span id="billHeaderCount">0 items</span>
+            <span class="bill-chevron" aria-hidden="true">⌄</span>
+          </span>
+        </button>
+        <button class="close" id="clearCart" title="Minimize current bill" aria-label="Minimize current bill">×</button>
       </div>
     </div>
 
-    <div class="cart-body">
-      <div class="editing" id="editingBanner"><span>Editing <span id="editingNo"></span></span><button class="small-btn" id="cancelEdit">Cancel edit</button></div>
-      <div id="cartItems" class="empty">No items yet</div>
-    </div>
-
-    <div class="bill-foot">
-      <div class="summary">
-        <div class="sum-row"><span>Subtotal</span><strong id="subtotal">₹0</strong></div>
-        <div class="sum-row"><span>Discount</span><label style="display:flex;align-items:center;gap:5px">₹<input id="discount" type="number" min="0" step="1" value="0" style="width:100px;padding:7px"></label></div>
-        <div class="sum-row total total-live"><span>Total</span><strong id="total">₹0</strong></div>
+    <div id="billExpandable" class="bill-expandable">
+      <div class="cart-body">
+        <div class="editing" id="editingBanner"><span>Editing <span id="editingNo"></span></span><button class="small-btn" id="cancelEdit">Cancel edit</button></div>
+        <div id="cartItems" class="empty">No items yet</div>
       </div>
 
-      <div class="pay-grid">
-        <label>Payment<select id="paymentMode"><option>Cash</option><option>UPI</option><option>Card</option><option>Other</option></select></label>
-        <label>Amount received<input id="amountPaid" type="number" min="0" step="1" placeholder="0"></label>
-        <div class="change"><span>Change</span><strong id="changeDue">₹0</strong></div>
-      </div>
+      <div class="bill-foot">
+        <div class="summary">
+          <div class="sum-row"><span>Subtotal</span><strong id="subtotal">₹0</strong></div>
+          <div class="sum-row"><span>Discount</span><label style="display:flex;align-items:center;gap:5px">₹<input id="discount" type="number" min="0" step="1" value="0" style="width:100px;padding:7px"></label></div>
+          <div class="sum-row total total-live"><span>Total</span><strong id="total">₹0</strong></div>
+        </div>
 
-      <div id="billMessage" class="message" aria-live="polite" role="status"></div>
-      <div class="action-row">
-        <button class="primary" id="completeBill">Complete bill <span style="opacity:.75">Ctrl + Enter</span></button>
-        <button class="danger" id="clearBill">Clear</button>
+        <details class="payment-details" id="paymentDetails">
+          <summary>
+            <span>Payment &amp; amount received</span>
+            <span class="payment-summary-inline"><strong id="paymentSummaryMode">Cash</strong><strong id="paymentSummaryReceived">₹0</strong><span class="payment-chevron" aria-hidden="true">⌄</span></span>
+          </summary>
+          <div class="payment-details-body">
+            <label>Payment<select id="paymentMode"><option>Cash</option><option>UPI</option><option>Card</option><option>Other</option></select></label>
+            <label>Amount received<input id="amountPaid" type="number" min="0" step="1" placeholder="0" inputmode="numeric"></label>
+            <div class="change"><span>Change</span><strong id="changeDue">₹0</strong></div>
+          </div>
+        </details>
+
+        <div id="billMessage" class="message" aria-live="polite" role="status"></div>
+        <div class="action-row">
+          <button class="primary" id="completeBill">Complete bill <span style="opacity:.75">Ctrl + Enter</span></button>
+          <button class="danger" id="clearBill">Clear</button>
+        </div>
       </div>
     </div>
   </aside>
@@ -653,7 +712,8 @@ const state = {
   category: "All",
   editingOrder: null,
   inventorySku: null,
-  cartMinimized: false
+  cartMinimized: false,
+  billCollapsed: false
 };
 
 // API connection
@@ -693,7 +753,7 @@ function message(el,msg,error=false){
   el.classList.toggle("success",!!msg && !error);
   if(error && el.id==="billMessage"){
     el.setAttribute("role","alert");
-    requestAnimationFrame(()=>el.scrollIntoView({behavior:"smooth",block:"nearest"}));
+    requestAnimationFrame(()=>{const bill=$("billCart");if(bill)bill.scrollTo({top:bill.scrollHeight,behavior:"smooth"});});
   }else if(el.id==="billMessage"){
     el.setAttribute("role","status");
   }
@@ -835,29 +895,38 @@ function syncMobileBillVisibility(){
     billing.classList.remove("bill-overlay-open","bill-overlay-closed");
     return;
   }
-
-  // With an empty cart, start minimized on mobile so the product/catalog area
-  // does not have a large unused reserved space. Adding an item opens the bill.
-  if(!state.cart.length && !state.editingOrder){
-    state.cartMinimized=true;
-  }
-
-  cart.classList.toggle("mobile-hidden", !!state.cartMinimized);
-  launcher.classList.toggle("show", !!state.cartMinimized);
-  billing.classList.toggle("bill-overlay-open", !state.cartMinimized);
-  billing.classList.toggle("bill-overlay-closed", !!state.cartMinimized);
-  const total = cartSubtotal();
-  const count = state.cart.reduce((sum,x)=>sum+Number(x.qty||0),0);
+  if(!state.cart.length && !state.editingOrder)state.cartMinimized=true;
+  cart.classList.toggle("mobile-hidden",!!state.cartMinimized);
+  launcher.classList.toggle("show",!!state.cartMinimized);
+  billing.classList.toggle("bill-overlay-open",!state.cartMinimized);
+  billing.classList.toggle("bill-overlay-closed",!!state.cartMinimized);
+  const total=cartSubtotal();
+  const count=state.cart.reduce((sum,x)=>sum+Number(x.qty||0),0);
   $("mobileBillLauncherTotal").textContent=money(total);
   $("mobileBillLauncherCount").textContent=`${count} item${count===1?"":"s"}`;
+  $("billHeaderTotal").textContent=money(total);
+  $("billHeaderCount").textContent=`${count} item${count===1?"":"s"}`;
+  $("paymentSummaryReceived").textContent=money(Number($("amountPaid").value||0));
+  $("paymentSummaryMode").textContent=$("paymentMode").value||"Cash";
+  $("billToggle").setAttribute("aria-expanded",state.billCollapsed?"false":"true");
 }
+
 function minimizeCurrentBill(){
   state.cartMinimized=true;
+  state.billCollapsed=false;
   syncMobileBillVisibility();
 }
 function openCurrentBill(){
   state.cartMinimized=false;
+  state.billCollapsed=false;
+  $("billExpandable").classList.remove("collapsed");
+  $("billToggle").setAttribute("aria-expanded","true");
   syncMobileBillVisibility();
+}
+function toggleCurrentBillPanel(){
+  state.billCollapsed=!state.billCollapsed;
+  $("billExpandable").classList.toggle("collapsed",state.billCollapsed);
+  $("billToggle").setAttribute("aria-expanded",state.billCollapsed?"false":"true");
 }
 function handleCartClose(){
   if(window.matchMedia("(max-width:760px)").matches){
@@ -894,6 +963,10 @@ function renderCart(){
   $("total").textContent=money(total);
   const paid=Number($("amountPaid").value||0);
   $("changeDue").textContent=money(Math.max(0,paid-total));
+  $("paymentSummaryMode").textContent=$("paymentMode").value||"Cash";
+  $("paymentSummaryReceived").textContent=money(paid);
+  $("billHeaderTotal").textContent=money(total);
+  $("billHeaderCount").textContent=`${state.cart.reduce((sum,x)=>sum+Number(x.qty||0),0)} item${state.cart.reduce((sum,x)=>sum+Number(x.qty||0),0)===1?"":"s"}`;
   syncMobileBillVisibility();
 }
 
@@ -908,7 +981,7 @@ function changeQty(i,d){
 function cartSubtotal(){return state.cart.reduce((sum,x)=>sum+lineForItem(x).lineTotal,0)}
 
 function clearCurrentBill(){
-  state.cart=[]; state.editingOrder=null;
+  state.cart=[]; state.editingOrder=null; state.billCollapsed=false;
   $("editingBanner").classList.remove("show");
   $("billTitle").textContent="Bill";
   $("completeBill").innerHTML="Complete bill <span style='opacity:.75'>Ctrl + Enter</span>";
@@ -957,6 +1030,8 @@ async function submitBill(){
 
   if(paid<total){
     $("amountPaid").classList.add("invalid");
+    openCurrentBill();
+    $("paymentDetails").open=true;
     message($("billMessage"),`Payment is short by ${money(total-paid)}. Amount received must be at least ${money(total)}. Nothing has been added to the bill.`,true);
     $("amountPaid").focus();
     return;
@@ -1234,6 +1309,7 @@ function escapeAttr(v){return escapeHtml(v)}
 $("dashboardDate").addEventListener("change",async()=>{await loadDashboard();await loadOrders()});
 $("discount").addEventListener("input",()=>{$("discount").classList.remove("invalid");renderCart()});
 $("amountPaid").addEventListener("input",()=>{$("amountPaid").classList.remove("invalid");renderCart()});
+$("paymentMode").addEventListener("change",()=>renderCart());
 function closeMenu(){
   $("sideMenu").classList.remove("show");
   $("menuOverlay").classList.remove("show");
@@ -1255,8 +1331,9 @@ document.querySelectorAll("[data-scroll]").forEach(b=>b.onclick=()=>{
   if(target)target.scrollIntoView({behavior:"smooth",block:"start"});
 });
 
-$("clearCart").onclick=handleCartClose;
-$("mobileBillLauncher").onclick=openCurrentBill;
+$("billToggle").onclick=toggleCurrentBillPanel;
+$("clearCart").onclick=(e)=>{e.stopPropagation();handleCartClose()};
+$("mobileBillLauncher").onclick=(e)=>{e.preventDefault();e.stopPropagation();openCurrentBill();};
 $("clearBill").onclick=clearCurrentBill;
 $("cancelEdit").onclick=clearCurrentBill;
 $("completeBill").onclick=submitBill;
@@ -1272,6 +1349,7 @@ $("exportExcel").onclick=()=>downloadUrl("/api/export/excel.xlsx");
 $("discount").addEventListener("input",()=>{$("discount").classList.remove("invalid");renderCart()});
 $("amountPaid").addEventListener("input",()=>{$("amountPaid").classList.remove("invalid");renderCart()});
 window.addEventListener("resize",syncMobileBillVisibility);
+$("mobileBillLauncher").addEventListener("touchend",(e)=>{e.preventDefault();e.stopPropagation();openCurrentBill();},{passive:false});
 
 document.addEventListener("keydown",(e)=>{
   const target=e.target;
@@ -1303,6 +1381,7 @@ document.addEventListener("keydown",(e)=>{
 });
 
 (async function init(){
+  state.billCollapsed=false;
   try{
     await loadMeta();
     await refreshAll();
