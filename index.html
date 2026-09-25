@@ -2957,7 +2957,8 @@
       editingOrder: null,
       inventorySku: null,
       cartMinimized: false,
-      billCollapsed: false
+      billCollapsed: false,
+      amountManuallyEdited: false
     };
 
     // API connection
@@ -3212,6 +3213,16 @@
       if ($("discountSummaryValue")) $("discountSummaryValue").textContent = money(discount);
       const total = Math.max(0, subtotal - discount);
       $("total").textContent = money(total);
+
+      // For a fresh bill, Amount received follows the current total.
+      // The operator can still edit it; once manually changed, it is preserved.
+      if (!state.cart.length) {
+        $("amountPaid").value = "";
+        state.amountManuallyEdited = false;
+      } else if (!state.amountManuallyEdited) {
+        $("amountPaid").value = Number(total).toFixed(2).replace(/\.00$/, "");
+      }
+
       const paid = Number($("amountPaid").value || 0);
       $("changeDue").textContent = money(Math.max(0, paid - total));
       $("paymentSummaryMode").textContent = $("paymentMode").value || "Cash";
@@ -3237,7 +3248,7 @@
       $("editingBanner").classList.remove("show");
       $("billTitle").textContent = "Bill";
       $("completeBill").innerHTML = "Complete bill <span style='opacity:.75'>Ctrl + Enter</span>";
-      $("discount").value = 0; $("amountPaid").value = ""; $("paymentMode").value = "UPI"; if ($("paymentDetails")) $("paymentDetails").open = false; if ($("discountDetails")) $("discountDetails").open = false;
+      $("discount").value = 0; $("amountPaid").value = ""; state.amountManuallyEdited = false; $("paymentMode").value = "UPI"; if ($("paymentDetails")) $("paymentDetails").open = false; if ($("discountDetails")) $("discountDetails").open = false;
       message($("billMessage"), "");
       renderCart();
       renderProducts();
@@ -3252,6 +3263,7 @@
       }));
       $("discount").value = Number(order.discount || 0);
       $("amountPaid").value = Number(order.amount_paid || 0);
+      state.amountManuallyEdited = true;
       $("paymentMode").value = order.payment_mode || "UPI";
       if ($("paymentDetails")) $("paymentDetails").open = false;
       if ($("discountDetails")) $("discountDetails").open = false;
@@ -3555,8 +3567,31 @@
     }
 
     function formatDate(v) {
-      try { return new Date(v).toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" }) }
-      catch { return v }
+      if (!v) return "—";
+      try {
+        let raw = String(v).trim();
+
+        // MongoDB/Python normally returns an ISO timestamp with a timezone.
+        // For legacy timestamps without an offset, interpret them as IST.
+        if (/^\d{4}-\d{2}-\d{2}T/.test(raw) && !/(Z|[+-]\d{2}:?\d{2})$/.test(raw)) {
+          raw += "+05:30";
+        }
+
+        const d = new Date(raw);
+        if (Number.isNaN(d.getTime())) return String(v);
+
+        return new Intl.DateTimeFormat("en-IN", {
+          timeZone: "Asia/Kolkata",
+          day: "2-digit",
+          month: "short",
+          year: "numeric",
+          hour: "2-digit",
+          minute: "2-digit",
+          hour12: true
+        }).format(d);
+      } catch {
+        return String(v);
+      }
     }
     function escapeHtml(v) {
       return String(v ?? "").replace(/[&<>"']/g, ch => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[ch]));
@@ -3565,7 +3600,11 @@
 
     $("dashboardDate").addEventListener("change", async () => { await loadDashboard(); await loadOrders() });
     $("discount").addEventListener("input", () => { $("discount").classList.remove("invalid"); renderCart() });
-    $("amountPaid").addEventListener("input", () => { $("amountPaid").classList.remove("invalid"); renderCart() });
+    $("amountPaid").addEventListener("input", () => {
+      state.amountManuallyEdited = true;
+      $("amountPaid").classList.remove("invalid");
+      renderCart();
+    });
     $("paymentMode").addEventListener("change", () => renderCart());
     function openQr() {
       const modal = $("qrModal");
@@ -3627,7 +3666,11 @@
     $("exportExcel").onclick = () => downloadUrl("/api/export/excel.xlsx");
 
     $("discount").addEventListener("input", () => { $("discount").classList.remove("invalid"); renderCart() });
-    $("amountPaid").addEventListener("input", () => { $("amountPaid").classList.remove("invalid"); renderCart() });
+    $("amountPaid").addEventListener("input", () => {
+      state.amountManuallyEdited = true;
+      $("amountPaid").classList.remove("invalid");
+      renderCart();
+    });
     window.addEventListener("resize", syncMobileBillVisibility);
     $("mobileBillLauncher").addEventListener("touchend", (e) => { e.preventDefault(); e.stopPropagation(); openCurrentBill(); }, { passive: false });
 
